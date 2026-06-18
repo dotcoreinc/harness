@@ -70,6 +70,10 @@ Initial phase for [nixantic-standalone](00-nixantic-standalone.md). This phase w
   * Uncertainty: The regression originates upstream when `OPENCODE_CONFIG_DIR` is read-only and missing `.gitignore`, while this repo should avoid broadening into writable temp-dir wrapper work.
   * Tried: Reviewed the rendered package assembly path and targeted the generated OpenCode config tree itself.
   * Result: The smallest compatible fix is to ship an empty `opencode/.gitignore` in the rendered package and cover it with renderer/core regression checks.
+* [x] Q: Can we add exported git-flavored package variants without redesigning the module architecture?
+  * Uncertainty: The repo already exported jj-default package names, and this follow-up needed git variants without introducing a broader profile/variant system.
+  * Tried: Reviewed the existing flake exports, core module render inputs, and wrapper/check derivations.
+  * Result: A narrow second core evaluation with `nixantic.versionControl.mode = "git"` is enough to export `builtin-git`, `claude-git`, and `opencode-git`, while keeping the existing jj-default exports unchanged and reusing the current module architecture.
 
 ## Tasks
 - [x] Build the detailed implementation plan and task breakdown (R1, R2, R3, R4)
@@ -163,6 +167,12 @@ Initial phase for [nixantic-standalone](00-nixantic-standalone.md). This phase w
   - AC: The generated OpenCode config tree includes an empty `.gitignore` file at its root
   - AC: Regression checks fail if the standalone rendered package or core-module output omits that file
   - AC: The fix stays scoped to generated config content and does not redesign wrapper writability behavior
+- [x] Export git-flavored package variants beside jj-default exports (R3)
+  - Agent: senior
+  - Dependencies: Phase 5
+  - AC: `packages.default`, `packages.builtin`, `packages.claude`, and `packages.opencode` remain jj-flavored
+  - AC: The flake exports `packages.builtin-git`, `packages.claude-git`, and `packages.opencode-git`
+  - AC: Validation checks prove the git variants render git-specific content and that the wrapper packages target the git-rendered config trees
 
 ## Files
 - **../appdots/flake.nix**: Consumer flake migration touchpoint and likely place where the standalone repo becomes an input.
@@ -190,6 +200,7 @@ Initial phase for [nixantic-standalone](00-nixantic-standalone.md). This phase w
 - **instructions/**: Expected new home for the repo-shipped configurable instruction corpus/profile.
 - **checks/** or equivalent test locations: Expected home for standalone validation tasks and regression checks.
 - **flake.nix**: Added standalone public flake surface for core/HM/flake-parts modules, built-in corpus package, wrapper packages, and checks.
+- **flake.nix**: Follow-up export enhancement. Adds `builtin-git`, `claude-git`, and `opencode-git` package outputs plus matching git-oriented checks while leaving the existing jj-default exports unchanged.
 - **flake.lock**: Added lock file for standalone `nixpkgs` and `flake-parts` inputs.
 - **source-sets.nix**: Copied reusable source discovery and duplicate validation into the standalone repo.
 - **framework/**: Copied reusable renderer, harnesses, package/BOM generation, and framework tests/fixtures; adjusted standalone paths and compatibility fixes found during validation.
@@ -198,6 +209,7 @@ Initial phase for [nixantic-standalone](00-nixantic-standalone.md). This phase w
 - **modules/flake-parts.nix**: Added exposure-only flake-parts module for package/check publication.
 - **instructions/**: Copied authored instruction corpus into the standalone built-in profile source tree.
 - **checks/default.nix**: Added standalone validation for core eval, HM adapter behavior, duplicate install targets, wrapper installation, and core evaluation without HM semantics.
+- **checks/default.nix**: Follow-up export enhancement. Adds targeted assertions that git-flavored exported packages render git-specific instruction content and that their wrappers point at the git package trees.
 - **../appdots/flake.nix**: Added `nixantic-standalone` path input, retained the local `./nixantic` adapter import, and added an appdots migration check for high-value generated/install/wrapper surfaces.
 - **../appdots/flake.lock**: Locked the local standalone path input with `nixpkgs` and `flake-parts` following appdots.
 - **../appdots/nixantic/default.nix**: Replaced local framework ownership with a compatibility adapter that imports the standalone flake-parts module and re-exports standalone HM modules.
@@ -208,3 +220,4 @@ Initial phase for [nixantic-standalone](00-nixantic-standalone.md). This phase w
 - **framework/output.nix**: Bugfix. Includes harness-declared root support files in assembled packages.
 - **framework/checks.nix**: Bugfix regression coverage for rendered-package OpenCode `.gitignore` presence and emptiness.
 - **checks/default.nix**: Bugfix regression coverage for standalone core/readme check surfaces exposing the OpenCode config tree.
+- **modules/core.nix**: Follow-up export enhancement. Makes built-in corpus and wrapper checks mode-aware so both jj-default and git-flavored exports validate the expected version-control-specific rendered content.
