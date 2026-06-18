@@ -34,9 +34,10 @@ Initial phase for [nixantic-standalone](00-nixantic-standalone.md). This phase w
   * Uncertainty: Naming conventions have shifted across `homeModules`, `homeManagerModules`, and generic module outputs.
   * Tried: Reviewed Home Manager docs and recent ecosystem discussions.
   * Result: Use compatibility aliases in the plan where the maintenance cost is small.
-* [ ] Q: What is the exact public API compatibility contract for the standalone repo?
+* [x] Q: What is the exact public API compatibility contract for the standalone repo?
   * Uncertainty: Current surfaces are split between flake-parts outputs and Home Manager module outputs, and the plan only says to preserve the `nixantic.*` namespace broadly.
-  * Need: Pin down the exact minimal flake export set, the canonical output path under `config.nixantic.instructions.*`, and the tiny compatibility alias set allowed for migration smoothing.
+  * Tried: Narrowed the export surface against R1/R2 needs and the desire to keep the flake API minimal.
+  * Result: Keep `config.nixantic.instructions.*` canonical. Export the standalone core module, the Home Manager module, the flake-parts module, and a runnable package for the built-in instructions profile. Do not export extra helper libs; keep only a tiny alias set where it materially reduces migration pain.
 * [x] Q: What corpus identity/profile model should be exposed by default?
   * Uncertainty: The repo should not hard-code an AP-focused identity, but the current authored corpus is still AP-specific in content and assumptions.
   * Tried: Compared neutral built-in profile naming with generic-default and opt-in-only alternatives.
@@ -54,14 +55,14 @@ Initial phase for [nixantic-standalone](00-nixantic-standalone.md). This phase w
 - [x] Build the detailed implementation plan and task breakdown (R1, R2, R3, R4)
   - AC: Requirements are expanded into concrete work items with clear acceptance criteria
   - AC: Key files/components, dependencies, testing strategy, and assigned agent levels are documented
-- [ ] Phase 1: establish the standalone framework skeleton (R1, R3)
+- [~] Phase 1: establish the standalone framework skeleton (R1, R3)
   - Agent: senior
   - Dependencies: none
   - AC: A standalone flake/package structure exists in this repo and can host the extracted framework without depending on `appdots`
   - AC: Reusable renderer files from `../appdots/nixantic/instructions/**` and supporting source discovery logic are copied or moved into coherent standalone locations
   - AC: Existing reusable tests/fixtures are ported or mirrored into the standalone repo as a baseline safety net
   - AC: A minimal public library surface exists for direct renderer usage in addition to the module-driven path
-- [ ] Phase 2: introduce the standalone core module (R1)
+- [~] Phase 2: introduce the standalone core module (R1)
   - Agent: staff
   - Dependencies: Phase 1
   - AC: A `lib.evalModules`-compatible core module owns the main `nixantic.*` option surface
@@ -69,21 +70,21 @@ Initial phase for [nixantic-standalone](00-nixantic-standalone.md). This phase w
   - AC: Core behavior no longer requires `home.file` or HM-specific module state
   - AC: Compatibility-sensitive outputs are preserved or intentionally documented where they differ
   - AC: The core documents how `pkgs` and other module arguments are provided, using `specialArgs` only where import-time resolution actually requires it
-- [ ] Phase 3: refactor the Home Manager adapter (R2)
+- [~] Phase 3: refactor the Home Manager adapter (R2)
   - Agent: senior
   - Dependencies: Phase 2
   - AC: The HM module consumes the core outputs instead of owning renderer behavior directly
   - AC: HM-specific install-file mapping remains functional, including duplicate-target validation
   - AC: Flake exports stay minimal while preserving only a small compatibility alias set where it materially reduces migration pain
   - AC: HM-specific tests prove the adapter still works while the core remains HM-independent
-- [ ] Phase 4: move and package the instruction corpus (R3)
+- [~] Phase 4: move and package the instruction corpus (R3)
   - Agent: senior
   - Dependencies: Phase 1, Phase 2
   - AC: The authored corpus is relocated from `../appdots/home-manager/modules/agentic/instructions/**` into `instructions/`
   - AC: Public configuration does not hard-code an AP-focused corpus identity; naming/profile selection is configurable
   - AC: The repo exposes a default configurable profile and/or convenient package path for rendering the shipped corpus
   - AC: Claude/OpenCode rendered trees for the shipped corpus build successfully from the standalone repo
-- [ ] Phase 5: provide optional generic config-dir wrappers (R3)
+- [~] Phase 5: provide optional generic config-dir wrappers (R3)
   - Agent: senior
   - Dependencies: Phase 4
   - AC: The repo provides optional wrapper package outputs for Claude Code and OpenCode that point at the generated config directory
@@ -105,25 +106,25 @@ Initial phase for [nixantic-standalone](00-nixantic-standalone.md). This phase w
   - AC: Example snippets are backed by checks or otherwise verified to stay in sync with the implementation
   - AC: Developer-facing docs explain source discovery, harness layout, and wrapper boundaries clearly
 
-- [ ] Add autonomous validation tasks for framework extraction (R1, R3)
+- [~] Add autonomous validation tasks for framework extraction (R1, R3)
   - Agent: senior
   - Dependencies: Phase 1
   - AC: Port or create reusable eval tests covering source discovery, frontmatter, dual outputs, post-processing, collisions, BOM generation, and settings behavior
   - AC: `nix flake check` or equivalent validation runs these framework tests in the standalone repo
   - AC: Failures identify root-cause regressions rather than being papered over by weakened assertions
-- [ ] Add autonomous validation tasks for the standalone core module (R1)
+- [~] Add autonomous validation tasks for the standalone core module (R1)
   - Agent: staff
   - Dependencies: Phase 2
   - AC: Tests evaluate the core with `lib.evalModules` outside Home Manager
   - AC: Tests assert concrete rendered/package outputs under `config.nixantic.instructions.*` and the absence of HM-only dependencies
   - AC: Compatibility-sensitive option behaviors are covered by targeted assertions
   - AC: Tests cover the documented `pkgs`/module-argument contract and guard against accidental overuse of `specialArgs`
-- [ ] Add autonomous validation tasks for the Home Manager adapter (R2)
+- [~] Add autonomous validation tasks for the Home Manager adapter (R2)
   - Agent: senior
   - Dependencies: Phase 3
   - AC: Tests cover HM install-file mapping, duplicate target validation, and integration with core outputs
   - AC: A regression test proves the same configuration can be evaluated via the core without HM install semantics
-- [ ] Add autonomous validation tasks for the shipped corpus and wrappers (R3)
+- [~] Add autonomous validation tasks for the shipped corpus and wrappers (R3)
   - Agent: senior
   - Dependencies: Phase 4, Phase 5
   - AC: Tests build the shipped Claude/OpenCode rendered trees and assert key files like `CLAUDE.md` and `AGENTS.md` exist with expected content anchors
