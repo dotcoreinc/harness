@@ -41,6 +41,10 @@ Next expected step is implementation against the foundation phase plan: establis
   * Uncertainty: Current ecosystem guidance is split between `homeModules`, `homeManagerModules`, and newer generic module outputs.
   * Tried: Checked current Home Manager manual and recent ecosystem discussion.
   * Result: Plan for compatibility aliases rather than forcing a single naming convention if the maintenance cost stays low.
+* [x] Q: Is our current understanding truly 10/10?
+  * Uncertainty: The initial plan covered the main architecture split, but may have left public API, wrapper, and migration details underspecified.
+  * Tried: Ran a staff-level ctx-improve pass across the project docs, `../appdots` source, and current ecosystem guidance for `lib.evalModules`, Home Manager module outputs, Claude, and OpenCode config surfaces.
+  * Result: Understanding improved, but the exact public API contract, wrapper env-var behavior, corpus profile identity, and migration mechanics still need to be pinned down before implementation can safely claim 10/10 understanding.
 
 ## Phases
 ### 🔄 01 Phase: foundation
@@ -48,10 +52,14 @@ Next expected step is implementation against the foundation phase plan: establis
 Define the implementation plan, architectural decisions, investigation notes, and execution breakdown for extracting Nixantic into a standalone repository. This phase covers the standalone framework skeleton, core module split, Home Manager adapter refactor, corpus move, migration path, and validation strategy.
 
 ## Files
+- **../appdots/flake.nix**: Upstream consumer entrypoint and migration touchpoint for switching from local framework imports to this standalone repo.
 - **../appdots/nixantic/default.nix**: Existing flake-parts integration layer. Source context for standalone flake/module exposure planning.
 - **../appdots/nixantic/home-manager.nix**: Current HM-owned option and install behavior. Main refactor target for the thin-adapter design.
 - **../appdots/nixantic/source-sets.nix**: Source discovery and duplicate validation behavior that should remain part of the reusable framework.
 - **../appdots/nixantic/instructions/**: Reusable renderer, harness logic, builders, outputs, checks, and tests that form the standalone framework base.
+- **../appdots/nixantic/instructions/frontmatter.nix**: Harness frontmatter rendering logic that affects Claude/OpenCode compatibility.
+- **../appdots/nixantic/instructions/harnesses/**: Built-in harness registry and per-harness output conventions that should stay explicit in the standalone design.
+- **../appdots/nixantic/instructions/render-bom.py**: BOM generation helper and part of the standalone dependency/testing surface.
 - **../appdots/home-manager/modules/agentic/instructions/**: Current authored instruction corpus to relocate into this repository under `instructions/`.
 - **../appdots/home-manager/modules/agentic/default.nix**: Current corpus consumer module and package wiring in `appdots`.
 - **../appdots/home-manager/modules/agentic/claude/default.nix**: Current Claude integration module. Important for separating generic wrappers from user-specific runtime glue.
