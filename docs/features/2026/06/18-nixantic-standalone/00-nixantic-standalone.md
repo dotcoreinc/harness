@@ -6,7 +6,7 @@ Extract the reusable Nixantic instruction system from `../appdots` into this sta
 ## Checkpoint
 Implementation for foundation Phases 1-7 is in place. The standalone repo owns the reusable renderer framework, `lib.evalModules` core module, thin Home Manager adapter, built-in instruction corpus under `instructions/`, generic Claude/OpenCode config-dir wrappers, autonomous validation checks, and README usage docs. `appdots` consumes this repo via a local path flake input while keeping its Claude/OpenCode wrappers, `nono`/`maybe` integration, opencode JSON generation, and local shell/runtime glue in `appdots`.
 
-The remaining follow-up is outside the foundation implementation: replace the local `appdots` path input with a remote/shared URL before using this setup outside this machine.
+The remaining follow-up is outside the foundation implementation: replace the local `appdots` path input with a remote/shared URL before using this setup outside this machine. A post-implementation bugfix now also ensures the generated OpenCode config tree ships an empty `.gitignore` so upstream OpenCode does not try to create it inside a read-only Nix store path at startup.
 
 ## Requirements
 * R1: ⬜ Provide a standalone Nixantic core module that is compatible with `lib.evalModules` and usable outside Home Manager (Phase: foundation)
@@ -64,6 +64,10 @@ The remaining follow-up is outside the foundation implementation: replace the lo
   * Uncertainty: Needed to pin down whether wrappers are package outputs, HM-only behavior, or outside the Nix surface.
   * Tried: Compared standalone usability needs against HM-only integration.
   * Result: Wrappers should exist as generic package outputs, HM may optionally install them, and each wrapper should set the existing harness-specific config-dir environment variable for its generated config tree.
+* [x] Q: Is the OpenCode read-only config-dir crash fixable in this repo without broadening into wrapper redesign?
+  * Uncertainty: Upstream OpenCode crashes when `OPENCODE_CONFIG_DIR` points at a read-only config tree and `.gitignore` is missing, but this task must avoid broadening into writable temp-dir wrapper changes.
+  * Tried: Checked the current standalone rendered package layout and upstream reports for the startup write behavior.
+  * Result: Shipping an empty `opencode/.gitignore` in the generated config tree is the smallest repo-local fix and verification target for this regression.
 * [x] Q: What migration sequence should be planned?
   * Uncertainty: A coordinated multi-repo switch would be riskier but potentially shorter.
   * Tried: Compared copy-first and coordinated migration strategies against reviewability and rollback safety.
@@ -101,3 +105,7 @@ Define the implementation plan, architectural decisions, investigation notes, an
 - **../appdots/nixantic/default.nix**: Phase 6 migration. Compatibility adapter to standalone flake-parts and HM module outputs.
 - **../appdots/home-manager/modules/agentic/default.nix**: Phase 6 migration. Imports standalone HM module and relies on its built-in corpus while preserving local integrations.
 - **README.md**: Phase 7 documentation. Covers standalone core usage, Home Manager adapter usage, flake-parts exposure, shipped corpus package, wrappers, direct renderer imports, source discovery, harness layout, and checks.
+- **framework/harnesses/opencode.nix**: Post-implementation bugfix. Declares the OpenCode root-level support files that must exist in the generated config tree, including an empty `.gitignore` for read-only store usage.
+- **framework/output.nix**: Post-implementation bugfix. Teaches package assembly to include harness-declared root support files alongside rendered instructions and skill subfiles.
+- **framework/checks.nix**: Post-implementation bugfix regression coverage for the generated OpenCode `.gitignore` file.
+- **checks/default.nix**: Post-implementation bugfix regression coverage for the standalone core/check surfaces that expose the OpenCode config tree.

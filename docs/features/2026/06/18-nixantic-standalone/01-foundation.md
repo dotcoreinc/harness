@@ -66,6 +66,10 @@ Initial phase for [nixantic-standalone](00-nixantic-standalone.md). This phase w
   * Uncertainty: The README needed practical examples for multiple module surfaces, but full markdown doctesting would add machinery beyond the phase scope.
   * Tried: Added `checks.readme-examples` with Nix expressions matching the README's core-module, direct-renderer, Home Manager install, and wrapper contracts.
   * Result: `nix flake check --show-trace` now builds the README example check and validates the documented output paths, content anchors, install mapping, and wrapper env vars.
+* [x] Q: Can the OpenCode read-only startup crash be fixed without changing the wrapper architecture?
+  * Uncertainty: The regression originates upstream when `OPENCODE_CONFIG_DIR` is read-only and missing `.gitignore`, while this repo should avoid broadening into writable temp-dir wrapper work.
+  * Tried: Reviewed the rendered package assembly path and targeted the generated OpenCode config tree itself.
+  * Result: The smallest compatible fix is to ship an empty `opencode/.gitignore` in the rendered package and cover it with renderer/core regression checks.
 
 ## Tasks
 - [x] Build the detailed implementation plan and task breakdown (R1, R2, R3, R4)
@@ -153,6 +157,12 @@ Initial phase for [nixantic-standalone](00-nixantic-standalone.md). This phase w
   - AC: Migration checks evaluate `appdots` against the standalone input and verify important generated surfaces remain acceptable
   - AC: Soft-parity comparisons focus on high-value behavior rather than brittle byte-for-byte reproduction unless explicitly needed
   - AC: Migration checks compare the current appdots-rendered package against the standalone-rendered package using high-value anchors and key paths
+- [x] Bugfix: pre-create OpenCode `.gitignore` in rendered config trees (R3)
+  - Agent: senior
+  - Dependencies: Phase 5
+  - AC: The generated OpenCode config tree includes an empty `.gitignore` file at its root
+  - AC: Regression checks fail if the standalone rendered package or core-module output omits that file
+  - AC: The fix stays scoped to generated config content and does not redesign wrapper writability behavior
 
 ## Files
 - **../appdots/flake.nix**: Consumer flake migration touchpoint and likely place where the standalone repo becomes an input.
@@ -194,3 +204,7 @@ Initial phase for [nixantic-standalone](00-nixantic-standalone.md). This phase w
 - **../appdots/home-manager/modules/agentic/default.nix**: Switched the agentic HM module to import the standalone HM module and rely on the standalone built-in corpus, while keeping appdots-specific packages and downstream Claude/OpenCode/nono modules local.
 - **README.md**: Added Phase 7 usage documentation for flake inputs, core module evaluation, Home Manager adapter usage, flake-parts exposure, shipped corpus packages, wrappers, direct renderer imports, source discovery, harness layout, and checks.
 - **checks/default.nix**: Added `readme-examples` check covering README example contracts for core usage, direct renderer usage, Home Manager install mapping, and wrapper env-vars.
+- **framework/harnesses/opencode.nix**: Bugfix. Declares an empty root `.gitignore` in rendered OpenCode config trees to avoid upstream startup writes into read-only store paths.
+- **framework/output.nix**: Bugfix. Includes harness-declared root support files in assembled packages.
+- **framework/checks.nix**: Bugfix regression coverage for rendered-package OpenCode `.gitignore` presence and emptiness.
+- **checks/default.nix**: Bugfix regression coverage for standalone core/readme check surfaces exposing the OpenCode config tree.
