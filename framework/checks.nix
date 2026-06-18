@@ -44,6 +44,7 @@ let
     test -f ${renderedPackage}/claude/commands/safe-command.md
     test -f ${renderedPackage}/opencode/AGENTS.md
     test -f ${renderedPackage}/opencode/BOM.md
+    test -f ${renderedPackage}/opencode/.gitignore
     test -f ${renderedPackage}/opencode/skills/safe-skill/SKILL.md
     test -f ${renderedPackage}/opencode/skills/safe-skill/refs/example.md
 
@@ -52,6 +53,7 @@ let
     grep -F 'allowed-tools: ["Bash(command: test)", "Read # docs"]' ${renderedPackage}/claude/commands/safe-command.md
     grep -F 'Command body.' ${renderedPackage}/claude/commands/safe-command.md
     grep -F '# Rendered Package OpenCode' ${renderedPackage}/opencode/AGENTS.md
+    test ! -s ${renderedPackage}/opencode/.gitignore
     grep -F 'Bundled reference body.' ${renderedPackage}/opencode/skills/safe-skill/refs/example.md
     grep -F '# Instruction BOM: claude' ${renderedPackage}/claude/BOM.md
     grep -F 'Estimated token counts using tiktoken encoding `cl100k_base`' ${renderedPackage}/claude/BOM.md

@@ -110,8 +110,10 @@ in
   core-module = pkgs.runCommand "nixantic-core-module-check" { } ''
     test -f ${coreEval.config.nixantic.instructions.package}/claude/CLAUDE.md
     test -f ${coreEval.config.nixantic.instructions.package}/opencode/AGENTS.md
+    test -f ${coreEval.config.nixantic.instructions.package}/opencode/.gitignore
     test -f ${coreNoBuiltinEval.config.nixantic.instructions.package}/claude/BOM.md
     grep -F '# Main instructions' ${coreEval.config.nixantic.instructions.package}/claude/CLAUDE.md
+    test ! -s ${coreEval.config.nixantic.instructions.package}/opencode/.gitignore
     touch $out
   '';
 
@@ -137,6 +139,7 @@ in
   readme-examples = pkgs.runCommand "nixantic-readme-examples-check" { } ''
     test -f ${docsCoreEval.config.nixantic.instructions.package}/claude/CLAUDE.md
     test -f ${docsCoreEval.config.nixantic.instructions.package}/opencode/AGENTS.md
+    test -f ${docsCoreEval.config.nixantic.instructions.package}/opencode/.gitignore
     test -f ${docsCoreEval.config.nixantic.instructions.package}/claude/commands/hello.md
     test -f ${docsDirectRendered.package}/opencode/commands/hello.md
 

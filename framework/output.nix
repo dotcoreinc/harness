@@ -120,6 +120,20 @@ let
           category = classifyEntry source filename;
           file = mkFile scope.harness.outputDir path filename content;
         };
+      mkRootFileEntry =
+        scope: relativePath: content:
+        let
+          harnessName = scope.harness.name or scope.harness.outputDir;
+        in
+        {
+          inherit content harnessName;
+          source = "supportFile";
+          harnessDir = scope.harness.outputDir;
+          inherit relativePath;
+          destination = "${scope.harness.outputDir}/${relativePath}";
+          category = "instructions";
+          file = mkFile scope.harness.outputDir relativePath relativePath content;
+        };
       # Each entry tracks its final destination path so collisions can be caught
       # with a clear diagnostic. Without this guard, two files resolving to the
       # same destination (e.g. a skill sub-file whose path equals an
@@ -129,6 +143,7 @@ let
           _: scope:
           (lib.mapAttrsToList (mkEntry scope "instruction") scope.instructions)
           ++ (lib.mapAttrsToList (mkEntry scope "skillFile") (scope.skillFiles or { }))
+          ++ (lib.mapAttrsToList (mkRootFileEntry scope) (scope.harness.rootFiles or { }))
         ) scopes
       );
 

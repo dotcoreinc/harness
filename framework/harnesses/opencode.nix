@@ -2,6 +2,9 @@
 {
   name = "opencode";
   outputDir = "opencode";
+  rootFiles = {
+    ".gitignore" = "";
+  };
 
   tools = {
     taskCreate = "todowrite";
