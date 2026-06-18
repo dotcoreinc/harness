@@ -38,6 +38,7 @@ let
     };
 
   coreEval = evalCore [ ];
+  gitCoreEval = evalCore [ { nixantic.versionControl.mode = "git"; } ];
   coreNoBuiltinEval = evalCore [ { nixantic.instructions.profile = "none"; } ];
   docsSources = {
     example = {
@@ -113,7 +114,26 @@ in
     test -f ${coreEval.config.nixantic.instructions.package}/opencode/.gitignore
     test -f ${coreNoBuiltinEval.config.nixantic.instructions.package}/claude/BOM.md
     grep -F '# Main instructions' ${coreEval.config.nixantic.instructions.package}/claude/CLAUDE.md
+    grep -F 'jj-current-branch' ${coreEval.config.nixantic.instructions.package}/claude/rules/version-control.md
     test ! -s ${coreEval.config.nixantic.instructions.package}/opencode/.gitignore
+    touch $out
+  '';
+
+  git-export-variants = pkgs.runCommand "nixantic-git-export-variants-check" { } ''
+    test -f ${gitCoreEval.config.nixantic.instructions.package}/claude/CLAUDE.md
+    test -f ${gitCoreEval.config.nixantic.instructions.package}/opencode/AGENTS.md
+    grep -F 'git branch --show-current' ${gitCoreEval.config.nixantic.instructions.package}/claude/rules/version-control.md
+    grep -F 'git branch --show-current' ${gitCoreEval.config.nixantic.instructions.package}/opencode/rules/version-control.md
+    if grep -F 'jj-current-branch' ${gitCoreEval.config.nixantic.instructions.package}/claude/rules/version-control.md; then
+      echo 'jj content leaked into git claude export' >&2
+      exit 1
+    fi
+    if grep -F 'jj-current-branch' ${gitCoreEval.config.nixantic.instructions.package}/opencode/rules/version-control.md; then
+      echo 'jj content leaked into git opencode export' >&2
+      exit 1
+    fi
+    grep -F '${gitCoreEval.config.nixantic.instructions.package}/claude' ${gitCoreEval.config.nixantic.instructions.wrappers.packages.claude}/bin/nixantic-claude
+    grep -F '${gitCoreEval.config.nixantic.instructions.package}/opencode' ${gitCoreEval.config.nixantic.instructions.wrappers.packages.opencode}/bin/nixantic-opencode
     touch $out
   '';
 

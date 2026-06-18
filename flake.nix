@@ -49,12 +49,17 @@
         let
           pkgs = import nixpkgs { inherit system; };
           core = (evalCore pkgs [ ]).config.nixantic.instructions;
+          gitCore =
+            (evalCore pkgs [ { nixantic.versionControl.mode = "git"; } ]).config.nixantic.instructions;
         in
         {
           default = core.package;
           builtin = core.package;
           claude = core.wrappers.packages.claude;
           opencode = core.wrappers.packages.opencode;
+          builtin-git = gitCore.package;
+          claude-git = gitCore.wrappers.packages.claude;
+          opencode-git = gitCore.wrappers.packages.opencode;
         }
       );
 
@@ -63,6 +68,8 @@
         let
           pkgs = import nixpkgs { inherit system; };
           core = (evalCore pkgs [ ]).config.nixantic.instructions;
+          gitCore =
+            (evalCore pkgs [ { nixantic.versionControl.mode = "git"; } ]).config.nixantic.instructions;
           validation = import ./checks {
             inherit pkgs;
             lib = nixpkgs.lib;
@@ -76,6 +83,9 @@
           builtin-corpus = core.corpusCheck;
           claude-wrapper = core.wrapperChecks.claude;
           opencode-wrapper = core.wrapperChecks.opencode;
+          git-builtin-corpus = gitCore.corpusCheck;
+          git-claude-wrapper = gitCore.wrapperChecks.claude;
+          git-opencode-wrapper = gitCore.wrapperChecks.opencode;
         }
       );
     };

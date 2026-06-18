@@ -71,6 +71,18 @@ let
     };
   };
 
+  versionControlMarkers =
+    if cfg.versionControl.mode == "git" then
+      {
+        expected = "git branch --show-current";
+        unexpected = "jj-current-branch";
+      }
+    else
+      {
+        expected = "jj-current-branch";
+        unexpected = "git branch --show-current";
+      };
+
   corpusCheck = pkgs.runCommand "nixantic-builtin-corpus-check" { } ''
     test -f ${rendered.package}/claude/CLAUDE.md
     test -f ${rendered.package}/opencode/AGENTS.md
@@ -79,6 +91,12 @@ let
     grep -F '# Main instructions' ${rendered.package}/claude/CLAUDE.md
     grep -F '# Main instructions' ${rendered.package}/opencode/AGENTS.md
     grep -F 'todowrite' ${rendered.package}/opencode/AGENTS.md
+    grep -F '${versionControlMarkers.expected}' ${rendered.package}/claude/rules/version-control.md
+    grep -F '${versionControlMarkers.expected}' ${rendered.package}/opencode/rules/version-control.md
+    if grep -F '${versionControlMarkers.unexpected}' ${rendered.package}/claude/rules/version-control.md; then
+      echo 'unexpected version-control content in rendered package' >&2
+      exit 1
+    fi
     touch $out
   '';
 
@@ -86,11 +104,13 @@ let
     claude = pkgs.runCommand "nixantic-claude-wrapper-check" { } ''
       grep -F 'CLAUDE_CONFIG_DIR' ${wrapperPackages.claude}/bin/${instructionCfg.wrappers.claude.name}
       grep -F '${rendered.package}/claude' ${wrapperPackages.claude}/bin/${instructionCfg.wrappers.claude.name}
+      grep -F '${versionControlMarkers.expected}' ${rendered.package}/claude/rules/version-control.md
       touch $out
     '';
     opencode = pkgs.runCommand "nixantic-opencode-wrapper-check" { } ''
       grep -F 'OPENCODE_CONFIG_DIR' ${wrapperPackages.opencode}/bin/${instructionCfg.wrappers.opencode.name}
       grep -F '${rendered.package}/opencode' ${wrapperPackages.opencode}/bin/${instructionCfg.wrappers.opencode.name}
+      grep -F '${versionControlMarkers.expected}' ${rendered.package}/opencode/rules/version-control.md
       touch $out
     '';
   };
