@@ -6,13 +6,16 @@ Initial phase for [nixantic-standalone](00-nixantic-standalone.md). This phase w
 ## Requirements
 * R1.A: Preserve the current `nixantic.*` option namespace while moving rendering behavior into a standalone `lib.evalModules`-compatible core module
 * R1.B: Keep the standalone core free of Home Manager dependencies and `home.file`-specific behavior
+* R1.C: Keep all shared option ownership in the core module so ecosystem modules compose on top of it rather than re-owning shared behavior
 * R2.A: Refactor the Home Manager module into a thin adapter that consumes the core outputs and performs HM install mapping
-* R2.B: Expose Home Manager module outputs through compatibility-friendly flake outputs when cheap to maintain
+* R2.B: Expose Home Manager module outputs through a minimal flake surface, allowing only a small compatibility alias set where it materially reduces migration pain
+* R2.C: Provide a flake-parts module as an ergonomic exposure layer only, not as a second behavioral ownership layer
 * R3.A: Move the reusable renderer framework from `../appdots/nixantic/**` into this repository without coupling it to appdots-specific runtime glue
-* R3.B: Move the authored instruction corpus into `instructions/` and make the public profile naming configurable rather than AP-specific
-* R3.C: Provide optional generic wrappers that launch Claude Code and OpenCode against the generated config directory
+* R3.B: Move the authored instruction corpus into `instructions/` and expose it as a neutral named built-in profile with configurable naming/selection rather than an AP-specific public identity
+* R3.C: Provide optional generic wrapper package outputs that launch Claude Code and OpenCode against the already-generated config directory by setting each harness-specific config-dir environment variable
 * R4.A: Preserve `appdots` ownership of user-specific integrations such as `nono`, `maybe`, shell helpers, and local machine/runtime glue
 * R4.B: Treat output parity with current `appdots` behavior as a soft goal with explicit regression checks where high value
+* R4.C: Use a copy-first, switch-later migration sequence so `appdots` only switches once the standalone repo is already working end-to-end
 
 ## Questions & Investigations
 * [x] Q: Where is the reusable framework already located?
@@ -33,16 +36,19 @@ Initial phase for [nixantic-standalone](00-nixantic-standalone.md). This phase w
   * Result: Use compatibility aliases in the plan where the maintenance cost is small.
 * [ ] Q: What is the exact public API compatibility contract for the standalone repo?
   * Uncertainty: Current surfaces are split between flake-parts outputs and Home Manager module outputs, and the plan only says to preserve the `nixantic.*` namespace broadly.
-  * Need: Pin down the canonical core options/outputs, any compatibility aliases, and the exact flake exports (`lib`, modules, packages, checks).
-* [ ] Q: What corpus identity/profile model should be exposed by default?
+  * Need: Pin down the exact minimal flake export set, the canonical output path under `config.nixantic.instructions.*`, and the tiny compatibility alias set allowed for migration smoothing.
+* [x] Q: What corpus identity/profile model should be exposed by default?
   * Uncertainty: The repo should not hard-code an AP-focused identity, but the current authored corpus is still AP-specific in content and assumptions.
-  * Need: Decide whether the repo ships a generic default profile, an AP-specific profile under a configurable/non-default name, or both.
-* [ ] Q: What exact wrapper behavior should be implemented for Claude and OpenCode?
+  * Tried: Compared neutral built-in profile naming with generic-default and opt-in-only alternatives.
+  * Result: Ship a neutral named built-in profile under `instructions/` with a default selectable profile and configurable naming/selection.
+* [x] Q: What exact wrapper behavior should be implemented for Claude and OpenCode?
   * Uncertainty: Claude and OpenCode differ in config-dir environment variables and current consumer wiring.
-  * Need: Decide the canonical wrapper contract, especially whether OpenCode should target `OPENCODE_CONFIG_DIR`, `OPENCODE_CONFIG`, or another explicit layout.
-* [ ] Q: What migration mechanics should be used between this repo and `appdots`?
+  * Tried: Compared HM-owned wrapper behavior against standalone package outputs and checked whether both harnesses already generate config directories.
+  * Result: Both harnesses already generate config directories; the repo-owned wrappers should be generic package outputs that simply set the existing harness-specific config-dir environment variable for that generated directory.
+* [x] Q: What migration mechanics should be used between this repo and `appdots`?
   * Uncertainty: A copy-first migration and a move-first migration have different safety and review characteristics.
-  * Need: Decide whether to establish a fully working standalone copy first and then switch `appdots`, or to do a tighter coordinated migration.
+  * Tried: Compared both strategies against reviewability, rollback safety, and cross-repo coordination overhead.
+  * Result: Use a copy-first, switch-later migration plan.
 
 ## Tasks
 - [x] Build the detailed implementation plan and task breakdown (R1, R2, R3, R4)
@@ -54,12 +60,12 @@ Initial phase for [nixantic-standalone](00-nixantic-standalone.md). This phase w
   - AC: A standalone flake/package structure exists in this repo and can host the extracted framework without depending on `appdots`
   - AC: Reusable renderer files from `../appdots/nixantic/instructions/**` and supporting source discovery logic are copied or moved into coherent standalone locations
   - AC: Existing reusable tests/fixtures are ported or mirrored into the standalone repo as a baseline safety net
-  - AC: A public library surface exists for direct renderer usage in addition to the future module-driven path
+  - AC: A minimal public library surface exists for direct renderer usage in addition to the module-driven path
 - [ ] Phase 2: introduce the standalone core module (R1)
   - Agent: staff
   - Dependencies: Phase 1
   - AC: A `lib.evalModules`-compatible core module owns the main `nixantic.*` option surface
-  - AC: Core evaluation works outside Home Manager and exposes rendered/package outputs required by downstream consumers
+  - AC: Core evaluation works outside Home Manager and exposes canonical rendered/package outputs under `config.nixantic.instructions.*`
   - AC: Core behavior no longer requires `home.file` or HM-specific module state
   - AC: Compatibility-sensitive outputs are preserved or intentionally documented where they differ
   - AC: The core documents how `pkgs` and other module arguments are provided, using `specialArgs` only where import-time resolution actually requires it
@@ -68,7 +74,7 @@ Initial phase for [nixantic-standalone](00-nixantic-standalone.md). This phase w
   - Dependencies: Phase 2
   - AC: The HM module consumes the core outputs instead of owning renderer behavior directly
   - AC: HM-specific install-file mapping remains functional, including duplicate-target validation
-  - AC: Flake module outputs expose compatibility-friendly HM module entrypoints and aliases where cheap to maintain
+  - AC: Flake exports stay minimal while preserving only a small compatibility alias set where it materially reduces migration pain
   - AC: HM-specific tests prove the adapter still works while the core remains HM-independent
 - [ ] Phase 4: move and package the instruction corpus (R3)
   - Agent: senior
@@ -80,10 +86,10 @@ Initial phase for [nixantic-standalone](00-nixantic-standalone.md). This phase w
 - [ ] Phase 5: provide optional generic config-dir wrappers (R3)
   - Agent: senior
   - Dependencies: Phase 4
-  - AC: The repo provides optional wrappers or equivalent launch surfaces for Claude Code and OpenCode that point at the generated config directory
+  - AC: The repo provides optional wrapper package outputs for Claude Code and OpenCode that point at the generated config directory
   - AC: Wrapper behavior remains generic and does not absorb appdots-specific integrations such as personal shell glue, `nono`, or `maybe`
   - AC: Standalone usage outside Home Manager is documented and testable for the wrapper path
-  - AC: Wrapper env-var behavior is explicit and tested per harness instead of assuming Claude/OpenCode use the same contract
+  - AC: Wrapper env-var behavior is explicit and tested per harness, with each wrapper setting its existing harness-specific config-dir environment variable
 - [ ] Phase 6: migrate `appdots` to consume the standalone repo (R4)
   - Agent: staff
   - Dependencies: Phase 2, Phase 3, Phase 4, Phase 5
@@ -109,7 +115,7 @@ Initial phase for [nixantic-standalone](00-nixantic-standalone.md). This phase w
   - Agent: staff
   - Dependencies: Phase 2
   - AC: Tests evaluate the core with `lib.evalModules` outside Home Manager
-  - AC: Tests assert concrete rendered/package outputs and the absence of HM-only dependencies
+  - AC: Tests assert concrete rendered/package outputs under `config.nixantic.instructions.*` and the absence of HM-only dependencies
   - AC: Compatibility-sensitive option behaviors are covered by targeted assertions
   - AC: Tests cover the documented `pkgs`/module-argument contract and guard against accidental overuse of `specialArgs`
 - [ ] Add autonomous validation tasks for the Home Manager adapter (R2)
@@ -121,7 +127,7 @@ Initial phase for [nixantic-standalone](00-nixantic-standalone.md). This phase w
   - Agent: senior
   - Dependencies: Phase 4, Phase 5
   - AC: Tests build the shipped Claude/OpenCode rendered trees and assert key files like `CLAUDE.md` and `AGENTS.md` exist with expected content anchors
-  - AC: Wrapper checks verify the generated config directory is the one used at launch time
+  - AC: Wrapper checks verify the generated config directory is the one used at launch time for each harness
   - AC: Snapshot-style checks are used only where they provide durable signal rather than noisy churn
   - AC: Harness-specific frontmatter and output directory behavior remain covered by targeted assertions
 - [ ] Add autonomous validation tasks for appdots migration safety (R4)

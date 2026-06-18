@@ -13,16 +13,19 @@ Next expected step is implementation against the foundation phase plan: establis
   * R1.1: Preserve the existing `nixantic.*` option namespace unless a compatibility-safe cleanup is explicitly justified in implementation planning
   * R1.2: Core behavior must not depend on `home.file` or Home Manager module state
   * R1.3: Core outputs must include the rendered instruction surface and package-oriented outputs needed by downstream consumers
+  * R1.4: Shared option ownership must live in the core module, with ecosystem layers importing it rather than re-owning shared behavior
 * R2: ⬜ Expose a Home Manager module that consumes the core module outputs instead of owning the core behavior directly (Phase: foundation)
   * R2.1: The Home Manager layer should stay thin and primarily map core outputs into HM install surfaces
   * R2.2: The flake should expose compatibility-friendly HM module outputs, with aliases where cheap and useful
+  * R2.3: A flake-parts module may exist for ergonomic exposure, but it should remain an exposure layer rather than a second behavioral ownership layer
 * R3: ⬜ Move the Claude/OpenCode instruction framework and corpus out of `../appdots` into this repository while keeping them usable through the standalone module surface (Phase: foundation)
   * R3.1: The framework must remain reusable without depending on AP-specific runtime integrations
-  * R3.2: The repo should provide a default configurable corpus/profile under `instructions/` without hard-coding an AP-focused public identity
-  * R3.3: The repo should provide optional generic wrappers that point Claude Code and OpenCode at the generated config directory
+  * R3.2: The repo should provide a default selectable built-in corpus/profile under `instructions/` without hard-coding an AP-focused public identity
+  * R3.3: The repo should provide optional generic wrappers as package outputs, with HM optionally installing them, that point Claude Code and OpenCode at the generated config directory via the harness-specific environment variable
 * R4: ⬜ Migrate `appdots` to consume the standalone repository with minimal disruption to user-specific runtime integrations (Phase: foundation)
   * R4.1: `appdots` should keep user-specific wrappers/integrations such as `nono`, `maybe`, local shell helpers, and other personal environment glue unless they are generalized first
   * R4.2: Output parity with current `appdots` behavior is a soft goal rather than a hard gate
+  * R4.3: Migration should follow a copy-first, switch-later sequence to reduce coordination risk between repositories
 
 ## Questions & Investigations
 * [x] Q: Should the standalone repo own only the framework, or also the corpus?
@@ -45,6 +48,26 @@ Next expected step is implementation against the foundation phase plan: establis
   * Uncertainty: The initial plan covered the main architecture split, but may have left public API, wrapper, and migration details underspecified.
   * Tried: Ran a staff-level ctx-improve pass across the project docs, `../appdots` source, and current ecosystem guidance for `lib.evalModules`, Home Manager module outputs, Claude, and OpenCode config surfaces.
   * Result: Understanding improved, but the exact public API contract, wrapper env-var behavior, corpus profile identity, and migration mechanics still need to be pinned down before implementation can safely claim 10/10 understanding.
+* [x] Q: Should the repo use a core module, HM module, and flake-parts module?
+  * Uncertainty: Needed to distinguish behavior ownership from output exposure.
+  * Tried: Reviewed the desired dendritic import model and compared it to the current split in `appdots`.
+  * Result: The repo should have a core module that owns shared behavior, a thin HM module that imports it and adds HM-only behavior, and a flake-parts module used only for output exposure ergonomics.
+* [x] Q: Where should shared option ownership live?
+  * Uncertainty: Shared options could have remained split between core and HM layers.
+  * Tried: Compared the migration cost of split ownership versus a clean core-owned surface.
+  * Result: Shared `nixantic.*` options should belong to the core module only; HM should add only HM-specific options and behavior.
+* [x] Q: What corpus identity/profile model should be planned?
+  * Uncertainty: The current corpus is AP-specific in content, but the public repo identity should remain neutral.
+  * Tried: Explored neutral built-in profile versus optional-only profile versus generic-default framing.
+  * Result: Ship the current corpus as a neutral named built-in profile under `instructions/`, with a default selectable profile and configurable naming/selection.
+* [x] Q: What wrapper contract should the repo own?
+  * Uncertainty: Needed to pin down whether wrappers are package outputs, HM-only behavior, or outside the Nix surface.
+  * Tried: Compared standalone usability needs against HM-only integration.
+  * Result: Wrappers should exist as generic package outputs, HM may optionally install them, and each wrapper should set the existing harness-specific config-dir environment variable for its generated config tree.
+* [x] Q: What migration sequence should be planned?
+  * Uncertainty: A coordinated multi-repo switch would be riskier but potentially shorter.
+  * Tried: Compared copy-first and coordinated migration strategies against reviewability and rollback safety.
+  * Result: Use a copy-first, switch-later migration plan so this repo is fully working before `appdots` begins consuming it.
 
 ## Phases
 ### 🔄 01 Phase: foundation
