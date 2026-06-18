@@ -4,9 +4,9 @@
 Extract the reusable Nixantic instruction system from `../appdots` into this standalone repository. The target is a Home-Manager-independent `lib.evalModules` core module that can be used on its own, while still exposing a thin Home Manager adapter for consumers that want HM integration. The repository scope includes both the reusable framework and AP's Claude/OpenCode instruction corpus.
 
 ## Checkpoint
-Project framing and initial plan are now defined. The work is to extract the reusable Nixantic instruction system from `../appdots` into this repository as a standalone package/module surface, while keeping Home Manager support as a thin adapter and preserving user-specific runtime integrations in `appdots` except for optional generic config-dir wrappers.
+Implementation for foundation Phases 1-7 is in place. The standalone repo owns the reusable renderer framework, `lib.evalModules` core module, thin Home Manager adapter, built-in instruction corpus under `instructions/`, generic Claude/OpenCode config-dir wrappers, autonomous validation checks, and README usage docs. `appdots` consumes this repo via a local path flake input while keeping its Claude/OpenCode wrappers, `nono`/`maybe` integration, opencode JSON generation, and local shell/runtime glue in `appdots`.
 
-Next expected step is implementation against the foundation phase plan: establish the standalone framework skeleton, introduce the non-Home-Manager core module, refactor the HM adapter, move the instruction corpus into `instructions/`, and then migrate `appdots` to consume the new repository.
+The remaining follow-up is outside the foundation implementation: replace the local `appdots` path input with a remote/shared URL before using this setup outside this machine.
 
 ## Requirements
 * R1: ⬜ Provide a standalone Nixantic core module that is compatible with `lib.evalModules` and usable outside Home Manager (Phase: foundation)
@@ -87,3 +87,17 @@ Define the implementation plan, architectural decisions, investigation notes, an
 - **../appdots/home-manager/modules/agentic/default.nix**: Current corpus consumer module and package wiring in `appdots`.
 - **../appdots/home-manager/modules/agentic/claude/default.nix**: Current Claude integration module. Important for separating generic wrappers from user-specific runtime glue.
 - **../appdots/home-manager/modules/agentic/opencode/default.nix**: Current OpenCode integration module. Important for separating generic wrappers from user-specific runtime glue.
+- **flake.nix**: Standalone public flake surface for core/HM/flake-parts modules, built-in corpus package, wrapper packages, and checks.
+- **flake.lock**: Locked standalone inputs for `nixpkgs` and `flake-parts`.
+- **source-sets.nix**: Standalone reusable source discovery and duplicate validation logic.
+- **framework/**: Standalone renderer framework, harness registry, package/BOM generation, and reusable tests/fixtures.
+- **modules/core.nix**: Core `lib.evalModules` module owning shared `nixantic.*` options and `config.nixantic.instructions.*` outputs.
+- **modules/home-manager.nix**: Thin Home Manager adapter importing core and mapping outputs into HM surfaces.
+- **modules/flake-parts.nix**: Exposure-only flake-parts module for package/check publication.
+- **instructions/**: Built-in instruction corpus profile copied from `appdots`.
+- **checks/default.nix**: Standalone validation checks for core, HM adapter, wrappers, and no-HM evaluation.
+- **../appdots/flake.nix**: Phase 6 migration. Adds the standalone path input, keeps the local Nixantic adapter import, and defines the appdots migration check.
+- **../appdots/flake.lock**: Phase 6 migration. Locks the standalone path input.
+- **../appdots/nixantic/default.nix**: Phase 6 migration. Compatibility adapter to standalone flake-parts and HM module outputs.
+- **../appdots/home-manager/modules/agentic/default.nix**: Phase 6 migration. Imports standalone HM module and relies on its built-in corpus while preserving local integrations.
+- **README.md**: Phase 7 documentation. Covers standalone core usage, Home Manager adapter usage, flake-parts exposure, shipped corpus package, wrappers, direct renderer imports, source discovery, harness layout, and checks.

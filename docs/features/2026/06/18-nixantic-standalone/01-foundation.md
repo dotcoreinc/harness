@@ -50,19 +50,35 @@ Initial phase for [nixantic-standalone](00-nixantic-standalone.md). This phase w
   * Uncertainty: A copy-first migration and a move-first migration have different safety and review characteristics.
   * Tried: Compared both strategies against reviewability, rollback safety, and cross-repo coordination overhead.
   * Result: Use a copy-first, switch-later migration plan.
+* [x] Q: Can the appdots renderer/tests be copied directly into the standalone repo?
+  * Uncertainty: The renderer was mostly reusable, but standalone flake evaluation and newer Nix tooling could expose latent fixture/test assumptions.
+  * Tried: Copied the reusable framework and test fixtures from `../appdots/nixantic/instructions/**`, adjusted paths, and ran `nix flake check --show-trace` until the standalone checks passed.
+  * Result: The copied framework works standalone after targeted fixes: frontmatter indentation now handles current `builtins.split` output, raw command metadata matches rendered command references, HM install tests stub `home.packages`, and the bad-block-reference check no longer depends on global Nix profile state.
+* [x] Q: What wrapper contract is testable without depending on user-installed Claude/OpenCode binaries?
+  * Uncertainty: Wrapper packages should be runnable and generic, but requiring `pkgs.claude-code`/`pkgs.opencode` would couple the standalone checks to package availability and appdots overlays.
+  * Tried: Implemented wrappers as shell packages that set `CLAUDE_CONFIG_DIR`/`OPENCODE_CONFIG_DIR` to the generated harness tree and then exec a configurable command name from PATH.
+  * Result: The core exposes generic wrapper packages and checks their env-var/config-dir behavior without importing appdots-specific wrapper logic, `nono`, `maybe`, tmux helpers, or local shell glue.
+* [x] Q: Can `appdots` safely switch to the standalone framework/corpus while keeping local runtime glue?
+  * Uncertainty: `appdots` needed to stop owning renderer/corpus behavior without breaking local Claude/OpenCode wrappers, `nono` profiles, opencode JSON generation, or generated file install mappings.
+  * Tried: Added `nixantic-standalone` as a path flake input in `../appdots`, replaced the local Nixantic flake-parts/HM module behavior with standalone module consumption, removed the local corpus sourceRoot from the agentic module, and added an appdots migration check that evaluates the agentic HM module with stubs.
+  * Result: The migration check builds the standalone-generated Claude/OpenCode trees, verifies HM install mappings for `CLAUDE.md`/`AGENTS.md`, confirms appdots-local opencode JSON and Claude/OpenCode/nono wrappers remain local, and checks key rendered content anchors.
+* [x] Q: Can README examples be tied to executable checks without creating a separate doctest system?
+  * Uncertainty: The README needed practical examples for multiple module surfaces, but full markdown doctesting would add machinery beyond the phase scope.
+  * Tried: Added `checks.readme-examples` with Nix expressions matching the README's core-module, direct-renderer, Home Manager install, and wrapper contracts.
+  * Result: `nix flake check --show-trace` now builds the README example check and validates the documented output paths, content anchors, install mapping, and wrapper env vars.
 
 ## Tasks
 - [x] Build the detailed implementation plan and task breakdown (R1, R2, R3, R4)
   - AC: Requirements are expanded into concrete work items with clear acceptance criteria
   - AC: Key files/components, dependencies, testing strategy, and assigned agent levels are documented
-- [~] Phase 1: establish the standalone framework skeleton (R1, R3)
+- [x] Phase 1: establish the standalone framework skeleton (R1, R3)
   - Agent: senior
   - Dependencies: none
   - AC: A standalone flake/package structure exists in this repo and can host the extracted framework without depending on `appdots`
   - AC: Reusable renderer files from `../appdots/nixantic/instructions/**` and supporting source discovery logic are copied or moved into coherent standalone locations
   - AC: Existing reusable tests/fixtures are ported or mirrored into the standalone repo as a baseline safety net
   - AC: A minimal public library surface exists for direct renderer usage in addition to the module-driven path
-- [~] Phase 2: introduce the standalone core module (R1)
+- [x] Phase 2: introduce the standalone core module (R1)
   - Agent: staff
   - Dependencies: Phase 1
   - AC: A `lib.evalModules`-compatible core module owns the main `nixantic.*` option surface
@@ -70,28 +86,28 @@ Initial phase for [nixantic-standalone](00-nixantic-standalone.md). This phase w
   - AC: Core behavior no longer requires `home.file` or HM-specific module state
   - AC: Compatibility-sensitive outputs are preserved or intentionally documented where they differ
   - AC: The core documents how `pkgs` and other module arguments are provided, using `specialArgs` only where import-time resolution actually requires it
-- [~] Phase 3: refactor the Home Manager adapter (R2)
+- [x] Phase 3: refactor the Home Manager adapter (R2)
   - Agent: senior
   - Dependencies: Phase 2
   - AC: The HM module consumes the core outputs instead of owning renderer behavior directly
   - AC: HM-specific install-file mapping remains functional, including duplicate-target validation
   - AC: Flake exports stay minimal while preserving only a small compatibility alias set where it materially reduces migration pain
   - AC: HM-specific tests prove the adapter still works while the core remains HM-independent
-- [~] Phase 4: move and package the instruction corpus (R3)
+- [x] Phase 4: move and package the instruction corpus (R3)
   - Agent: senior
   - Dependencies: Phase 1, Phase 2
   - AC: The authored corpus is relocated from `../appdots/home-manager/modules/agentic/instructions/**` into `instructions/`
   - AC: Public configuration does not hard-code an AP-focused corpus identity; naming/profile selection is configurable
   - AC: The repo exposes a default configurable profile and/or convenient package path for rendering the shipped corpus
   - AC: Claude/OpenCode rendered trees for the shipped corpus build successfully from the standalone repo
-- [~] Phase 5: provide optional generic config-dir wrappers (R3)
+- [x] Phase 5: provide optional generic config-dir wrappers (R3)
   - Agent: senior
   - Dependencies: Phase 4
   - AC: The repo provides optional wrapper package outputs for Claude Code and OpenCode that point at the generated config directory
   - AC: Wrapper behavior remains generic and does not absorb appdots-specific integrations such as personal shell glue, `nono`, or `maybe`
   - AC: Standalone usage outside Home Manager is documented and testable for the wrapper path
   - AC: Wrapper env-var behavior is explicit and tested per harness, with each wrapper setting its existing harness-specific config-dir environment variable
-- [ ] Phase 6: migrate `appdots` to consume the standalone repo (R4)
+- [x] Phase 6: migrate `appdots` to consume the standalone repo (R4)
   - Agent: staff
   - Dependencies: Phase 2, Phase 3, Phase 4, Phase 5
   - AC: `appdots` replaces local Nixantic framework imports with inputs from this standalone repo
@@ -99,39 +115,39 @@ Initial phase for [nixantic-standalone](00-nixantic-standalone.md). This phase w
   - AC: High-value regression checks confirm rendered entry files, install behavior, and key output surfaces remain acceptable after migration
   - AC: Any intentional drift from previous `appdots` behavior is documented as a soft-parity deviation rather than an accidental regression
   - AC: The migration sequence is documented clearly enough to avoid partial-switch states that strand `appdots` between two incompatible framework surfaces
-- [ ] Phase 7: documentation and examples polish (R1, R2, R3)
+- [x] Phase 7: documentation and examples polish (R1, R2, R3)
   - Agent: junior
   - Dependencies: Phase 2, Phase 3, Phase 4, Phase 5
   - AC: README or equivalent usage docs cover direct renderer usage, standalone core module usage, Home Manager adapter usage, and shipped corpus usage
   - AC: Example snippets are backed by checks or otherwise verified to stay in sync with the implementation
   - AC: Developer-facing docs explain source discovery, harness layout, and wrapper boundaries clearly
 
-- [~] Add autonomous validation tasks for framework extraction (R1, R3)
+- [x] Add autonomous validation tasks for framework extraction (R1, R3)
   - Agent: senior
   - Dependencies: Phase 1
   - AC: Port or create reusable eval tests covering source discovery, frontmatter, dual outputs, post-processing, collisions, BOM generation, and settings behavior
   - AC: `nix flake check` or equivalent validation runs these framework tests in the standalone repo
   - AC: Failures identify root-cause regressions rather than being papered over by weakened assertions
-- [~] Add autonomous validation tasks for the standalone core module (R1)
+- [x] Add autonomous validation tasks for the standalone core module (R1)
   - Agent: staff
   - Dependencies: Phase 2
   - AC: Tests evaluate the core with `lib.evalModules` outside Home Manager
   - AC: Tests assert concrete rendered/package outputs under `config.nixantic.instructions.*` and the absence of HM-only dependencies
   - AC: Compatibility-sensitive option behaviors are covered by targeted assertions
   - AC: Tests cover the documented `pkgs`/module-argument contract and guard against accidental overuse of `specialArgs`
-- [~] Add autonomous validation tasks for the Home Manager adapter (R2)
+- [x] Add autonomous validation tasks for the Home Manager adapter (R2)
   - Agent: senior
   - Dependencies: Phase 3
   - AC: Tests cover HM install-file mapping, duplicate target validation, and integration with core outputs
   - AC: A regression test proves the same configuration can be evaluated via the core without HM install semantics
-- [~] Add autonomous validation tasks for the shipped corpus and wrappers (R3)
+- [x] Add autonomous validation tasks for the shipped corpus and wrappers (R3)
   - Agent: senior
   - Dependencies: Phase 4, Phase 5
   - AC: Tests build the shipped Claude/OpenCode rendered trees and assert key files like `CLAUDE.md` and `AGENTS.md` exist with expected content anchors
   - AC: Wrapper checks verify the generated config directory is the one used at launch time for each harness
   - AC: Snapshot-style checks are used only where they provide durable signal rather than noisy churn
   - AC: Harness-specific frontmatter and output directory behavior remain covered by targeted assertions
-- [ ] Add autonomous validation tasks for appdots migration safety (R4)
+- [x] Add autonomous validation tasks for appdots migration safety (R4)
   - Agent: staff
   - Dependencies: Phase 6
   - AC: Migration checks evaluate `appdots` against the standalone input and verify important generated surfaces remain acceptable
@@ -163,3 +179,18 @@ Initial phase for [nixantic-standalone](00-nixantic-standalone.md). This phase w
 - **modules/home-manager.nix**: Expected thin Home Manager adapter to add during implementation.
 - **instructions/**: Expected new home for the repo-shipped configurable instruction corpus/profile.
 - **checks/** or equivalent test locations: Expected home for standalone validation tasks and regression checks.
+- **flake.nix**: Added standalone public flake surface for core/HM/flake-parts modules, built-in corpus package, wrapper packages, and checks.
+- **flake.lock**: Added lock file for standalone `nixpkgs` and `flake-parts` inputs.
+- **source-sets.nix**: Copied reusable source discovery and duplicate validation into the standalone repo.
+- **framework/**: Copied reusable renderer, harnesses, package/BOM generation, and framework tests/fixtures; adjusted standalone paths and compatibility fixes found during validation.
+- **modules/core.nix**: Added `lib.evalModules`-compatible core module owning shared `nixantic.*` options and canonical `config.nixantic.instructions.*` outputs.
+- **modules/home-manager.nix**: Added thin HM adapter importing core and mapping generated outputs to `home.file`/optional wrapper packages.
+- **modules/flake-parts.nix**: Added exposure-only flake-parts module for package/check publication.
+- **instructions/**: Copied authored instruction corpus into the standalone built-in profile source tree.
+- **checks/default.nix**: Added standalone validation for core eval, HM adapter behavior, duplicate install targets, wrapper installation, and core evaluation without HM semantics.
+- **../appdots/flake.nix**: Added `nixantic-standalone` path input, retained the local `./nixantic` adapter import, and added an appdots migration check for high-value generated/install/wrapper surfaces.
+- **../appdots/flake.lock**: Locked the local standalone path input with `nixpkgs` and `flake-parts` following appdots.
+- **../appdots/nixantic/default.nix**: Replaced local framework ownership with a compatibility adapter that imports the standalone flake-parts module and re-exports standalone HM modules.
+- **../appdots/home-manager/modules/agentic/default.nix**: Switched the agentic HM module to import the standalone HM module and rely on the standalone built-in corpus, while keeping appdots-specific packages and downstream Claude/OpenCode/nono modules local.
+- **README.md**: Added Phase 7 usage documentation for flake inputs, core module evaluation, Home Manager adapter usage, flake-parts exposure, shipped corpus packages, wrappers, direct renderer imports, source discovery, harness layout, and checks.
+- **checks/default.nix**: Added `readme-examples` check covering README example contracts for core usage, direct renderer usage, Home Manager install mapping, and wrapper env-vars.
