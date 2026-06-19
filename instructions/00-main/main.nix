@@ -13,9 +13,6 @@
       heading = "Main instructions";
 
       content = ''
-        ## Context
-        My name is AP, using NixOS+MacOS (home manager+nixos+nix darwin) and fish shell.
-
         ## Top level
         CRITICAL: When encounter file reference (ex: @rules/general.md), if not already loaded, read it.
 
