@@ -24,13 +24,10 @@
           Project/directory specific instructions: CLAUDE.md, AGENTS.md, .opencode/AGENTS.md
 
           User instructions / commands / agents:
-          - Don't try to edit ~/.claude or ~/.config/opencode directly, as they are rendered version of instructions in my dotfiles
-          - All instructions in ~/dotfiles/home-manager/modules/agentic/instructions/
-          - Rendering driven by `nixantic` component that lives in `~/dotfiles/nixantic`
-          - You MUST read both CLAUDE.md to understand structure:
-            - ~/dotfiles/nixantic/CLAUDE.md for renderer and reusable instruction patterns
-            - ~/dotfiles/home-manager/modules/agentic/CLAUDE.md for my setup specific instructions
-          - In ~/dotfiles/home-manager/modules/agentic/instructions, folders are organization feature, not actually rendered. Nix files define fragments.
+          - Don't try to edit ~/.claude or ~/.config/opencode directly, as they are rendered versions of instruction source files.
+          - Instruction sources are `.nix` files, typically under **~/dotfiles/**.
+          - If you cannot locate them, **ask the user** where their instruction source files are.
+          - Folders are an organization feature, not directly reflected in rendered output. Nix files define fragments.
           - Commands/skills or sub-directory instruction files should not needlessy repeat information in more global instruction files.
 
           ## Instructions principles
@@ -49,7 +46,7 @@
           ## Instructions writing
 
           - Which instruction to edit should be based on context. If not clear what/where to edit, STOP and ask user.
-          - You may not be able to edit them directly either if you're in a sandbox. If that's the case, tell the userr and give a detailed description of changes that need to be done. User will ask an agent inside ~/dotfiles.
+          - You may not be able to edit them directly either if you're in a sandbox. If that's the case, tell the user and give a detailed description of changes that need to be done.
           - Load similar/surrounding instruction files for patterns.
           - Do reconnaissance, find edit locations and then propose edit plan to user.
           - If you spent too much time finding information about nixantic or dotfiles setup, propose changes to dotfiles CLAUDE.md's.
