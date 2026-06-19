@@ -1,8 +1,22 @@
 # Nixantic standalone
 
-Nixantic renders authored instruction fragments into Claude Code and OpenCode config trees. This repo contains the reusable renderer, a `lib.evalModules` core module, a thin Home Manager adapter, and one built-in instruction profile under `instructions/`.
+This repo has two equal parts:
 
-The stable surface is the module surface:
+- the Nixantic Nix-driven renderer and module framework for agentic config generation
+- built-in instructions with workflows, commands, instructions, skills, agents, and related source content
+
+Together they render authored instruction fragments into Claude Code and OpenCode config trees.
+
+If you consume this repo as a dependency, the stable surface is the module API. The internal renderer layout is not the public contract.
+
+The framework pieces exposed through the flake are:
+
+- the renderer in `framework/`
+- the main `lib.evalModules` surface in `modules/core.nix`
+- a small Home Manager adapter in `modules/home-manager.nix`
+- the flake-parts exposure layer in `modules/flake-parts.nix`
+
+The built-in instructions source lives in `instructions/`.
 
 - `nixanticModules.default` / `nixanticModules.core`: standalone core module
 - `homeManagerModules.default` / `homeModules.default`: Home Manager adapter
@@ -11,9 +25,13 @@ The stable surface is the module surface:
 - `packages.<system>.claude`: wrapper that sets `CLAUDE_CONFIG_DIR`
 - `packages.<system>.opencode`: wrapper that sets `OPENCODE_CONFIG_DIR`
 
-The canonical rendered outputs live under `config.nixantic.instructions.*`.
+The canonical rendered outputs, including the built-in instructions, live under `config.nixantic.instructions.*`.
 
-## Flake input
+`README.md` is for consumers. The root `CLAUDE.md` is for contributors and agents working on this repo.
+
+## Quick start
+
+Add the flake input:
 
 ```nix
 {
@@ -33,9 +51,11 @@ Use a local path during development:
 }
 ```
 
+Then pick the integration surface that matches your setup.
+
 ## Standalone core module
 
-Use the core module when you want rendered packages without Home Manager. Pass `pkgs` through `specialArgs`; the module imports the renderer with that package set.
+Use the core module when you want rendered packages without Home Manager. Pass `pkgs` through `specialArgs`. The module imports the renderer with that package set.
 
 ```nix
 { inputs, nixpkgs, ... }:
@@ -65,11 +85,11 @@ in
 evaluated.config.nixantic.instructions.package
 ```
 
-Leave `nixantic.instructions.profile` at its default (`"builtin"`) to render the shipped corpus before your extra sources. Set it to `"none"` for a blank profile.
+Leave `nixantic.instructions.profile` at its default (`"builtin"`) to render the built-in instructions before your extra sources. Set it to `"none"` for a blank profile.
 
 ## Home Manager adapter
 
-The Home Manager module imports the core module and only adds HM install behavior. Shared options stay in the core module.
+The Home Manager module imports the core module and adds install behavior. Shared options stay in the core module.
 
 ```nix
 { inputs, ... }:
@@ -114,11 +134,11 @@ Import the flake-parts module when a flake should publish a rendered package and
 }
 ```
 
-This module is only an exposure layer. It evaluates the core module and publishes `packages.<name>` and `checks.<name>`.
+This module is an exposure layer. It evaluates the core module and publishes `packages.<name>` and `checks.<name>`.
 
-## Shipped corpus and wrappers
+## Built-in corpus and wrappers
 
-Build the shipped profile:
+Build the built-in profile:
 
 ```bash
 nix build .#builtin
@@ -142,7 +162,7 @@ nix run .#claude -- --help
 nix run .#opencode -- --help
 ```
 
-The wrappers do one thing: set the harness config directory to the generated tree, then `exec` the configured executable.
+Each wrapper sets the harness config directory to the generated tree, then `exec`s the configured executable.
 
 | Package | Binary | Env var | Config dir |
 | --- | --- | --- | --- |
@@ -160,7 +180,7 @@ Override the executable or wrapper name through the core module:
 
 ## Direct renderer use
 
-Direct renderer imports are useful for renderer development and low-level tests. Prefer the core module for consumers because it owns the supported option surface.
+Direct renderer imports are useful for renderer development and low-level tests. For consumer configs, prefer the core module because it owns the supported option surface.
 
 ```nix
 let
@@ -212,4 +232,4 @@ Run the repo checks with:
 nix flake check --show-trace
 ```
 
-The check set covers renderer behavior, core module evaluation without Home Manager, Home Manager install mapping, built-in corpus rendering, wrapper env vars, and README example contracts.
+The check set covers renderer behavior, core module evaluation without Home Manager, Home Manager install mapping, built-in corpus rendering, wrapper environment variables, and README example contracts.
