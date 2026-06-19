@@ -1,4 +1,4 @@
-# Nixantic standalone
+# Dotcore agentic harness
 
 This repo has two equal parts:
 
