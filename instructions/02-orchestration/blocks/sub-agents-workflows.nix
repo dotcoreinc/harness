@@ -38,7 +38,7 @@
 
           * Parallelism: if multiple unrelated tasks, launch multiple sub-agents in parallel, but careful about potential file conflicts.
 
-          * Prompt to sub-agent: optimize prompts for sub-agents, reference project files and push to read instead of copying in prompt to sub-agent.
+          * Prompt to sub-agent: optimize prompts for sub-agents, reference project files and push to read instead of copying in prompt to sub-agent. Always inform them that they are sub-agents, not main agent.
 
           * Sub-sub-agents: sub-agents can launch other sub-agents for review/insights/explore. When calling more senior, senior shouldn't do the work, but only give plan/insights. Calling more junior can be done to help manage context on grunt work. Follow agent selection rule. Never delegate to the same level agent work, you can do it.
 
