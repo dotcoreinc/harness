@@ -4,6 +4,7 @@
     harnesses = [ "opencode" ];
     content = ''
       Do not use any web browser tool yourself. Always use the dedicated browser sub-agent for any web browsing tasks.
+      Do not use browser sub-agent for normal web search and web fetch. If you are a senior/staff/principal agent, you can delegate those to junior agent.
     '';
   };
 

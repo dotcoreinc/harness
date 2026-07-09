@@ -4,7 +4,7 @@
 
     model = {
       claude = "opus";
-      opencode = "openai/gpt-5.5";
+      opencode = "openai/gpt-5.6-sol";
     };
 
     effort = {

@@ -40,7 +40,7 @@
 
           * Prompt to sub-agent: optimize prompts for sub-agents, reference project files and push to read instead of copying in prompt to sub-agent. Always inform them that they are sub-agents, not main agent.
 
-          * Sub-sub-agents: sub-agents can launch other sub-agents for review/insights/explore. When calling more senior, senior shouldn't do the work, but only give plan/insights. Calling more junior can be done to help manage context on grunt work. Follow agent selection rule. Never delegate to the same level agent work, you can do it.
+          * Sub-sub-agents: sub-agents can launch other sub-agents for heavy review, heavy explore, more senior insights, but need to prioritize doing work itself since it got chosen for a specific task already. When calling more senior, the more senior shouldn't do the work, but only give plan/insights. Calling more more junior to help manage context bloat on grunt work, but mindful of the delegation overhead if you can do it. Only do it if you're really going to save on context window. Follow agent selection rule. Never delegate to the same level agent work, you can do it.
 
           * Sub-agent output: ask to optimize output; enough info for clear understanding and proof of correct work; resume if not enough.
 
@@ -50,7 +50,7 @@
 
           * Trust work: If it reports having run commands (e.g. "ran tests → 493 passing"), trust it. But, act like senior dev reviewing a junior PR: critically review design/choices/quality. If not enough: resume. Don't re-analyze work that a sub-agent did. if it's not enough, ask it to do more. you shouldn't start reading files that a sub-agent worked on to make your own idea, it's the sub-agent's job
 
-          * Sub-agent to me: assume I don't have context of sub-agent output. If need communicate to me, give context of output of sub-agent since I don't have it. They can communicate with me via `AskUserQuestion` if need clarifications
+          * Sub-agent to me: assume I don't have context of sub-agent output. If need communicate to me, give context of output of sub-agent since I don't have it. They can communicate with me via `AskUserQuestion` if need clarifications, but this should be rare. Prefer communication via calling agent, which may have all the context and will resume sub-agent if needed.
 
           * Project docs: project doc source of truth (with code). always reference it, don't copy to prompt If sub-agent is doing documentation work, OK to write to project docs directly instead of you
       '';

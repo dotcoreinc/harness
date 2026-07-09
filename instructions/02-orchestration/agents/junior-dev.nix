@@ -5,6 +5,7 @@
     model = {
       claude = "haiku";
       opencode = "opencode-go/deepseek-v4-flash";
+      #opencode = "openai/gpt-5.6-luna";
     };
 
     content = ''

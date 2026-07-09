@@ -4,7 +4,7 @@
 
     model = {
       claude = "sonnet";
-      opencode = "openai/gpt-5.4";
+      opencode = "openai/gpt-5.6-terra";
     };
 
     content = ''
