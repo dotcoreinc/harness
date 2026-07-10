@@ -15,7 +15,7 @@
 
         ${scope.blocks."project-files".embed}
 
-        If project files are listed, STOP and report. This command only creates a new committed project.
+        If ad-hoc project files are listed, STOP and report. This command only creates committed project files.
 
         ## Instructions
         1. Ensure ${scope.skills."proj-writing".reference} loaded.
