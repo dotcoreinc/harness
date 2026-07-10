@@ -3,7 +3,7 @@
   nixantic.sources.projects.commands."proj-plan" =
     { scope }:
     {
-      description = "Create high-level development plan and write to project/phases docs";
+      description = "Create high-level development plan and write to committed project/phases docs";
       argumentHint = "[task-description]";
 
       effort = "xhigh";
@@ -15,11 +15,10 @@
 
         ${scope.blocks."project-files".embed}
 
+        If project files are listed, STOP and report. This command only creates a new committed project.
+
         ## Instructions
         1. Ensure ${scope.skills."proj-writing".reference} loaded.
-           - If project files above empty, STOP, and tell user. If in-memory planning required, use ${
-             scope.commands."ctx-plan".reference
-           } instead.
 
         2. 🔳 Ensure context loaded, goal clear, task defined
            - Use ${scope.commands."proj-load".reference} if not already loaded.

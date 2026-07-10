@@ -3,41 +3,48 @@
   nixantic.sources.context-management.commands."ctx-plan" =
     { scope }:
     {
-      description = "Create high-level development/execution plan in memory";
+      description = "Create high-level development plan and write to ad-hoc/temp project/phases docs";
       argumentHint = "[task-description]";
 
       effort = "xhigh";
 
       content = ''
-        Goal: build a full plan for the task at hand, in memory/context: $ARGUMENTS
+        Goal: build a full, ad hoc plan for the task at hand: $ARGUMENTS
 
         ## State
+
         ${scope.blocks."project-files".embed}
+
+        If project files are listed, STOP and report. This command only creates a new ad hoc project.
+
+        ## Instructions
+        1. Ensure ${scope.skills."proj-writing".reference} loaded.
+
+        2. 🔳 Create the ad hoc folder
+           - From the workspace root, run `agentic-proj-create-adhoc` with no arguments.
+           - Create normal `00-<project>.md` and `01-<phase>.md` files in the directory reported by `agentic-proj-docs`.
+
+        3. 🔳 Ensure context loaded, goal clear, task defined
+           - Clarify via `AskUserQuestion` if empty or unclear.
+
+        4. 🔳 Research, clarify and plan
+           ${scope.blocks."plan-procedure".embed}
+
+        5. 🔳 Report your understanding using ${scope.blocks.context-understanding.reference}. If understanding < 10/10, suggest ${
+          scope.commands."ctx-improve".reference
+        }
+
+        6. 🔳 Write plan to docs
+           - Need to use ${
+             scope.skills."proj-writing".reference
+           }, use project & phase docs rules and structure
+
+        7. ${scope.blocks."engagement-gate".gate}
 
         ${scope.forHarness {
           claude = "NEVER engage the native plan mode `EnterPlanMode`";
           default = "";
         }}
-
-        ## Instructions
-        1. If project files listed above show, confirm with user if they want to write plan to project docs. If yes, STOP, and tell user to run ${
-          scope.commands."proj-plan".reference
-        }.
-
-        2. 🔳 Ensure context loaded, goal clear, task defined
-           - Clarify via `AskUserQuestion` if empty or unclear.
-
-        3. 🔳 Research, clarify and plan
-           ${scope.blocks."plan-procedure".embed}
-
-        4. 🔳 Report your understanding using ${scope.blocks.context-understanding.reference}. If understanding < 10/10, suggest ${
-          scope.commands."ctx-improve".reference
-        }
-
-        5. 🔳 Expose plan to user without writing to docs.
-           - Use the project doc structure and rules as a template, but keep the plan in memory and do not write docs.
-
-        6. ${scope.blocks."engagement-gate".gate}
       '';
     };
 }

@@ -15,6 +15,7 @@
 
       content = ''
         Project/feature docs spanning potentially multiple PRs. Source of truth as context window ephemeral.
+        Can be in both committed (usually `proj` -> `docs/features/...`) or ad-hoc/temp (usually `proj-adhoc` -> `/tmp/...`).
 
         Before authoring project docs, make sure ${scope.skills."proj-writing".reference} loaded.
 
@@ -23,8 +24,8 @@
         * Project folder: `docs/features/<yyyy>/<mm>/<dd>-<project-name>/` (run `date +%Y/%m/%d` to get it)
         * Main doc: `00-<project-name>.md` inside the folder
         * Phase docs: `01-<phase-name>.md`, `02-<phase-name>.md`, etc. (numbered for ordering)
-        * Symlink: `proj/` at repo root pointing to the project folder
-        * To print location of `proj` and its content, run `agentic-proj-docs`
+        * Symlink: `proj/` at repo root pointing to the project folder for committed project files, `proj-adhoc/` for ad-hoc project files.
+        * To print location of `proj` or `proj-adhoc` and its content, run `agentic-proj-docs`
 
         ## Creation & update
         Always via ${scope.skills."proj-writing".reference}.

@@ -25,8 +25,8 @@
            - Interview me relentlessly, using `AskUserQuestion`, about every aspect of this plan until we reach a shared understanding. Walk down each branch of the design tree, resolving dependencies between decisions one-by-one. For each question, provide your recommended answer. Any questions you could answer yourself through research should be researched first. If still unsure, give me as much context as possible in questions.
            - Go back to step 2 after each answers that require further analysis. Should add more tasks 🔳 to track progress.
 
-        4. 🔳 Update project & phases docs
-           - If planned into project docs. If in-memory, don't need to write. If unclear, ask user.
+        4. 🔳 Update project files
+           - Update the relevant project files with investigation outcomes and decisions. If unclear, ask user.
 
         5. **STOP**: User decides next action.
       '';

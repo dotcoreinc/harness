@@ -9,9 +9,9 @@
       content = ''
         Goal: proceed to implementation of the plan/task at hand
 
-        IMPORTANT: If planning was done via ${
-          scope.commands."ctx-plan".reference
-        }, you should NOT read/write to project docs. Assume they don't exist.
+        ## State
+
+        ${scope.blocks."project-files".embed}
 
         # Instructions
 
@@ -20,7 +20,7 @@
            - If unclear, ask user to ${scope.commands."ctx-improve".reference}
            - Clarify if task contradicts or overlaps
 
-        2. 🔳 Load tasks from project/phase doc/context
+        2. 🔳 Load tasks from project/phase docs
            - For each task, create 1..n `${scope.harness.tools.taskCreate}`
              - Segment for better tracking
            - Create tasks for verification/testing each implementation step.

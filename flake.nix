@@ -57,6 +57,8 @@
           builtin = core.package;
           claude = core.wrappers.packages.claude;
           opencode = core.wrappers.packages.opencode;
+          agentic-proj-docs = core.tools.packages.agentic-proj-docs;
+          agentic-proj-create-adhoc = core.tools.packages.agentic-proj-create-adhoc;
           builtin-git = gitCore.package;
           claude-git = gitCore.wrappers.packages.claude;
           opencode-git = gitCore.wrappers.packages.opencode;

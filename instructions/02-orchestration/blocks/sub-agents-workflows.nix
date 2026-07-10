@@ -38,13 +38,13 @@
 
           * Parallelism: if multiple unrelated tasks, launch multiple sub-agents in parallel, but careful about potential file conflicts.
 
-          * Prompt to sub-agent: optimize prompts for sub-agents, reference project files and push to read instead of copying in prompt to sub-agent. Always inform them that they are sub-agents, not main agent.
+          * Prompt to sub-agent: optimize prompts for sub-agents, reference the relevant project and phase files listed by `agentic-proj-docs` and push to read instead of copying in prompt to sub-agent. Always inform them that they are sub-agents, not main agent.
 
-          * Sub-sub-agents: sub-agents can launch other sub-agents for heavy review, heavy explore, more senior insights, but need to prioritize doing work itself since it got chosen for a specific task already. When calling more senior, the more senior shouldn't do the work, but only give plan/insights. Calling more more junior to help manage context bloat on grunt work, but mindful of the delegation overhead if you can do it. Only do it if you're really going to save on context window. Follow agent selection rule. Never delegate to the same level agent work, you can do it.
+          * Sub-sub-agents: sub-agents can launch other sub-agents for heavy review, heavy explore, more senior insights, but need to prioritize doing work itself since it got chosen for a specific task already. When calling more senior, it shouldn't do the work tasked to you, but only give plan/insights. Calling more more junior can be done for context heavy work or grunt work, but mindful of the delegation overhead. Follow agent selection rule. Never delegate to the same level agent work, you can do it.
 
           * Sub-agent output: ask to optimize output; enough info for clear understanding and proof of correct work; resume if not enough.
 
-          * Resuming: If sub-agent output is insufficient, send resume / follow-up message. Ask targeted follow-up questions. If I ask you a question that previous sub-agent should have answered, resume it instead of answering directly or launching a new one. 
+          * Resuming: If sub-agent output is insufficient, send resume / follow-up message. Ask targeted follow-up questions. If I ask you a question that previous sub-agent should have answered, resume it instead of answering directly or launching a new one.
 
           * Reuse: If I ask for a small change to a previous sub-agent's work, resume it instead of creating a new one to do the change. For new tasks, use new sub-agents to prevent blowing up context, even if it's related, to prevent context blowup and focus.
 
@@ -52,7 +52,7 @@
 
           * Sub-agent to me: assume I don't have context of sub-agent output. If need communicate to me, give context of output of sub-agent since I don't have it. They can communicate with me via `AskUserQuestion` if need clarifications, but this should be rare. Prefer communication via calling agent, which may have all the context and will resume sub-agent if needed.
 
-          * Project docs: project doc source of truth (with code). always reference it, don't copy to prompt If sub-agent is doing documentation work, OK to write to project docs directly instead of you
+          * Project files: always reference relevant project files rather than copying their contents into sub-agent prompts. If sub-agent is doing documentation work, it's OK for it to write directly to the listed files.
       '';
     };
 }

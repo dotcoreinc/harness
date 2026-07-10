@@ -63,8 +63,10 @@ in
 
   config = {
     home.file = installFiles;
-    home.packages = lib.mkIf cfg.instructions.wrappers.install (
-      builtins.attrValues cfg.instructions.wrappers.packages
-    );
+    home.packages =
+      (builtins.attrValues cfg.instructions.tools.packages)
+      ++ (lib.optionals cfg.instructions.wrappers.install (
+        builtins.attrValues cfg.instructions.wrappers.packages
+      ));
   };
 }

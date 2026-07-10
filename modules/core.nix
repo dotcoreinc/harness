@@ -71,6 +71,11 @@ let
     };
   };
 
+  toolPackages = {
+    "agentic-proj-docs" = import ../tools/agentic-proj-docs.nix { inherit pkgs; };
+    "agentic-proj-create-adhoc" = import ../tools/agentic-proj-create-adhoc.nix { inherit pkgs; };
+  };
+
   versionControlMarkers =
     if cfg.versionControl.mode == "git" then
       {
@@ -217,6 +222,14 @@ in
         readOnly = true;
         description = "Validation checks for generated wrapper packages.";
       };
+
+      tools = {
+        packages = lib.mkOption {
+          type = lib.types.attrsOf lib.types.package;
+          readOnly = true;
+          description = "Runtime tools required by rendered instruction protocols.";
+        };
+      };
     };
   };
 
@@ -225,5 +238,6 @@ in
     package = rendered.package;
     check = rendered.check;
     wrappers.packages = wrapperPackages;
+    tools.packages = toolPackages;
   };
 }
