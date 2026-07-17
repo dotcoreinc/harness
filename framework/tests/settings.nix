@@ -77,8 +77,14 @@ let
     }
     {
       name = "when-gated agents commands and skills are omitted";
-      pass = jjScope.agents == { } && jjScope.commands == { } && jjScope.skills == { };
-      detail = "expected major artifact kinds omitted in jj mode";
+      pass =
+        builtins.hasAttr "visible-agent" gitScope.agents
+        && builtins.hasAttr "visible-command" gitScope.commands
+        && builtins.hasAttr "visible-skill" gitScope.skills
+        && jjScope.agents == { }
+        && jjScope.commands == { }
+        && jjScope.skills == { };
+      detail = "expected major artifact kinds present in git mode and omitted in jj mode";
     }
     {
       name = "when predicate must return a boolean";

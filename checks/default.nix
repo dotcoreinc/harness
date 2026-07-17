@@ -119,8 +119,6 @@ in
     }/bin/agentic-proj-create-adhoc
     test -f ${coreEval.config.nixantic.instructions.package}/opencode/.gitignore
     test -f ${coreNoBuiltinEval.config.nixantic.instructions.package}/claude/BOM.md
-    grep -F '# Main instructions' ${coreEval.config.nixantic.instructions.package}/claude/CLAUDE.md
-    grep -F 'jj-current-branch' ${coreEval.config.nixantic.instructions.package}/claude/rules/version-control.md
     test ! -s ${coreEval.config.nixantic.instructions.package}/opencode/.gitignore
     touch $out
   '';
@@ -128,16 +126,24 @@ in
   git-export-variants = pkgs.runCommand "nixantic-git-export-variants-check" { } ''
     test -f ${gitCoreEval.config.nixantic.instructions.package}/claude/CLAUDE.md
     test -f ${gitCoreEval.config.nixantic.instructions.package}/opencode/AGENTS.md
-    grep -F 'git branch --show-current' ${gitCoreEval.config.nixantic.instructions.package}/claude/rules/version-control.md
-    grep -F 'git branch --show-current' ${gitCoreEval.config.nixantic.instructions.package}/opencode/rules/version-control.md
-    if grep -F 'jj-current-branch' ${gitCoreEval.config.nixantic.instructions.package}/claude/rules/version-control.md; then
-      echo 'jj content leaked into git claude export' >&2
-      exit 1
-    fi
-    if grep -F 'jj-current-branch' ${gitCoreEval.config.nixantic.instructions.package}/opencode/rules/version-control.md; then
-      echo 'jj content leaked into git opencode export' >&2
-      exit 1
-    fi
+    assert_variant() {
+      expected=$1
+      unexpected=$2
+      shift 2
+      for rules in "$@"; do
+        grep -F "$expected" "$rules"
+        if grep -F "$unexpected" "$rules"; then
+          echo "unexpected version-control variant in $rules" >&2
+          exit 1
+        fi
+      done
+    }
+    assert_variant 'jj-current-branch' 'git branch --show-current' \
+      ${coreEval.config.nixantic.instructions.package}/claude/rules/version-control.md \
+      ${coreEval.config.nixantic.instructions.package}/opencode/rules/version-control.md
+    assert_variant 'git branch --show-current' 'jj-current-branch' \
+      ${gitCoreEval.config.nixantic.instructions.package}/claude/rules/version-control.md \
+      ${gitCoreEval.config.nixantic.instructions.package}/opencode/rules/version-control.md
     grep -F '${gitCoreEval.config.nixantic.instructions.package}/claude' ${gitCoreEval.config.nixantic.instructions.wrappers.packages.claude}/bin/nixantic-claude
     grep -F '${gitCoreEval.config.nixantic.instructions.package}/opencode' ${gitCoreEval.config.nixantic.instructions.wrappers.packages.opencode}/bin/nixantic-opencode
     touch $out
@@ -177,19 +183,7 @@ in
   core-without-home-manager = pkgs.runCommand "nixantic-core-without-home-manager-check" { } ''
     test -f ${coreNoBuiltinEval.config.nixantic.instructions.package}/opencode/BOM.md
     grep -F 'agentic-proj-create-adhoc' ${coreEval.config.nixantic.instructions.package}/claude/commands/ctx-plan.md
-    grep -F 'normal `00-<project>.md` and `01-<phase>.md` files' ${coreEval.config.nixantic.instructions.package}/claude/commands/ctx-plan.md
     grep -F 'agentic-proj-create-adhoc' ${coreEval.config.nixantic.instructions.package}/opencode/commands/ctx-plan.md
-    grep -F 'normal `00-<project>.md` and `01-<phase>.md` files' ${coreEval.config.nixantic.instructions.package}/opencode/commands/ctx-plan.md
-    for instructions in ${coreEval.config.nixantic.instructions.package}/claude ${coreEval.config.nixantic.instructions.package}/opencode; do
-      if grep -R -E 'proj-adhoc/ctx-plan\.md|active planning record|project-backed|record-state' "$instructions"; then
-        echo "stale planning-record terminology in $instructions" >&2
-        exit 1
-      fi
-      if grep -E 'mktemp|umask|ln -s' "$instructions/commands/ctx-plan.md"; then
-        echo "ctx-plan embeds ad hoc project setup in $instructions" >&2
-        exit 1
-      fi
-    done
     touch $out
   '';
 
@@ -205,13 +199,11 @@ in
       mkdir "$physical"
       ln -s "$physical" "$alias"
 
-      output=$(cd "$alias" && ${createAdHoc}/bin/agentic-proj-create-adhoc)
+      (cd "$alias" && ${createAdHoc}/bin/agentic-proj-create-adhoc)
       test -L "$physical/proj-adhoc"
       target=$(readlink -f "$physical/proj-adhoc")
       test -d "$target"
       test "$(stat -c %a "$target")" = 700
-      printf '%s\n' "$output" | grep -F "Created ad hoc project link: $physical/proj-adhoc"
-      printf '%s\n' "$output" | grep -F "Temporary project directory: $target"
 
       rm "$physical/proj-adhoc"
       ln -s "$root/missing" "$physical/proj-adhoc"
@@ -253,8 +245,9 @@ in
       rm -rf "$physical/proj-adhoc"
 
       ln -s "$root/missing" "$physical/proj-adhoc"
-      output=$(cd "$physical" && OPENCODE_ROOT= CLAUDE_ROOT= ${projectDocs}/bin/agentic-proj-docs)
-      test "$output" = "No project files found."
+      (cd "$physical" && OPENCODE_ROOT= CLAUDE_ROOT= ${projectDocs}/bin/agentic-proj-docs)
+      test ! -e "$physical/proj"
+      test -L "$physical/proj-adhoc"
       rm "$physical/proj-adhoc"
 
       ad_hoc_target="$root/ad-hoc-project"

@@ -51,7 +51,7 @@
 
           * Trust work: If it reports having run commands (e.g. "ran tests → 493 passing"), trust it. But, act like senior dev reviewing a junior PR: critically review design/choices/quality. If not enough: resume. Don't re-analyze work that a sub-agent did. if it's not enough, ask it to do more. you shouldn't start reading files that a sub-agent worked on to make your own idea, it's the sub-agent's job
 
-          * Sub-agent to me: assume I don't have context of sub-agent output. If need communicate to me, give context of output of sub-agent since I don't have it. They can communicate with me via `AskUserQuestion` if need clarifications, but this should be rare. Prefer communication via calling agent, which may have all the context and will resume sub-agent if needed.
+          * Sub-agent to me: assume I don't have context of sub-agent output. If need communicate to me, give context of output of sub-agent since I don't have it. They can communicate with me via `AskUserQuestion` if need clarifications, but this should be rare. Should not be used for agreeing on plan, since plan should have been communicated via parent agent. Prefer communication via calling agent, which may have all the context and will resume sub-agent if needed.
 
           * Project files: always reference relevant project files rather than copying their contents into sub-agent prompts. If sub-agent is doing documentation work, it's OK for it to write directly to the listed files.
       '';

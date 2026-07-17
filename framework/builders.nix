@@ -291,10 +291,6 @@ let
     }
     // extra;
 
-  # mkReference :: string -> string -> string
-  #   Formats a natural reference to an invocable instruction artifact.
-  mkReference = kind: name: "the `${name}` ${kind}";
-
   # forHarness :: scope -> { <harness-name>?, default?, ... } -> value
   #   scope: active instruction scope containing harness.name
   #   <harness-name>: value selected when key matches the active harness
