@@ -10,9 +10,7 @@
       content = ''
         Goal: load context about project / task from project docs.
 
-        Don't load ${
-          scope.skills."proj-load".reference
-        }: this is the ${scope.skills."proj-load".name} skill.
+        Do not load ${scope.commands."proj-load".reference} recursively.
 
         ## State
 

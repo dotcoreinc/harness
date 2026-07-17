@@ -85,6 +85,40 @@ let
     };
   };
 
+  referenceRenderingSources = optionBase // {
+    commands = {
+      "dual-source" =
+        { scope }:
+        {
+          description = "Command with an OpenCode skill companion";
+          content = "Dual command body";
+          asSkill = {
+            opencode = true;
+          };
+        };
+      "command-only-source" = {
+        description = "Command without a skill companion";
+        content = "Command-only body";
+      };
+      "uses-command-references" =
+        { scope }:
+        {
+          description = "Command referencing command artifacts";
+          content = "Use ${scope.commands."dual-source".reference} and ${
+            scope.commands."command-only-source".reference
+          }.";
+        };
+    };
+  };
+
+  referenceRenderingClaudeScope = mkScope {
+    sources = referenceRenderingSources;
+  };
+
+  referenceRenderingOpencodeScope = mkOpencodeScope {
+    sources = referenceRenderingSources;
+  };
+
   skillReferenceScope = mkScope {
     sources = optionBase // {
       commands = {
@@ -557,18 +591,27 @@ let
     {
       name = "raw command references expose name and reference";
       pass =
-        lib.hasInfix "Use (See command: target) or (See command: custom-target)."
+        lib.hasInfix "Use the `target` command or the `custom-target` command."
           commandReferenceScope.commands."uses-command".embed
-        && commandReferenceScope.commands."uses-command".reference == "(See command: uses-command)";
+        && commandReferenceScope.commands."uses-command".reference == "the `uses-command` command";
       detail = "expected command source functions to reference raw command metadata";
+    }
+    {
+      name = "function-valued dual-output commands select the active harness artifact";
+      pass =
+        lib.hasInfix "Use the `dual-source` command and the `command-only-source` command."
+          referenceRenderingClaudeScope.commands."uses-command-references".embed
+        &&
+          lib.hasInfix "Use the `dual-source` skill and the `command-only-source` command."
+            referenceRenderingOpencodeScope.commands."uses-command-references".embed;
+      detail = "expected dual-output references to select skills only for OpenCode and plain commands to stay commands";
     }
     {
       name = "raw skill references expose name and reference";
       pass =
-        lib.hasInfix
-          "Use (See skill: directory-skill), (See skill: skill-command), and custom-skill-command."
+        lib.hasInfix "Use the `directory-skill` skill, the `skill-command` skill, and custom-skill-command."
           skillReferenceScope.commands."uses-skills".embed
-        && skillReferenceScope.skills."directory-skill".reference == "(See skill: directory-skill)";
+        && skillReferenceScope.skills."directory-skill".reference == "the `directory-skill` skill";
       detail = "expected source functions to reference raw directory and command-derived skill metadata";
     }
     {

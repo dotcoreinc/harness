@@ -3,6 +3,10 @@
 let
   frontmatter = import ./frontmatter.nix;
 
+  # mkReference :: string -> string -> string
+  #   Formats a natural reference to an invocable instruction artifact.
+  mkReference = kind: name: "the `${name}` ${kind}";
+
   # mkInstructions :: { heading, content, outputPath?, harnesses?, ... }
   #   Authored instruction files (CLAUDE.md, AGENTS.md, rule files).
   #   Source: nixantic.sources.<source-owner>.instructions.*, keyed by output key.
@@ -153,7 +157,7 @@ let
     in
     {
       embed = "${frontmatter}\n${args.content}";
-      reference = "(See ${if kind == "directory" then "skill" else "command"}: ${args.name})";
+      reference = mkReference (if kind == "directory" then "skill" else "command") args.name;
       outputPath = args.outputPath or null;
     };
 
@@ -287,6 +291,10 @@ let
     }
     // extra;
 
+  # mkReference :: string -> string -> string
+  #   Formats a natural reference to an invocable instruction artifact.
+  mkReference = kind: name: "the `${name}` ${kind}";
+
   # forHarness :: scope -> { <harness-name>?, default?, ... } -> value
   #   scope: active instruction scope containing harness.name
   #   <harness-name>: value selected when key matches the active harness
@@ -328,6 +336,7 @@ let
       mkSkill
       mkSkillFile
       mkCommand
+      mkReference
       forHarness
       forSetting
       renderFrontmatter

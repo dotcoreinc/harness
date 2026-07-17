@@ -5,6 +5,7 @@
   mkSkill,
   mkSkillFile,
   mkCommand,
+  mkReference,
   forHarness,
   forSetting,
   renderFrontmatter,
@@ -95,8 +96,8 @@ let
     let
       selectedSources = ensureSourceDefaults self.sources;
       rawAgentMetadata = mkRawAgentMetadata selectedSources.agents;
-      rawCommandMetadata = mkRawCommandMetadata selectedSources.commands;
-      rawSkillMetadata = mkRawSkillMetadata selectedSources.skills self.rawCommands;
+      rawCommandMetadata = mkRawCommandMetadata self self.rawCommands;
+      rawSkillMetadata = mkRawSkillMetadata self.rawSkills self.rawCommands;
     in
     {
       rawBlocks = lib.mapAttrs (
@@ -186,7 +187,7 @@ let
                 if subData.kind == "nix" then
                   self.scopeApi.mkSkillFile {
                     content =
-                      applySource self (mkRawAgentMetadata self.rawAgents) (mkRawCommandMetadata self.rawCommands)
+                      applySource self (mkRawAgentMetadata self.rawAgents) (mkRawCommandMetadata self self.rawCommands)
                         (mkRawSkillMetadata self.rawSkills self.rawCommands)
                         subData.content;
                     outputPath = fullPath;
@@ -444,20 +445,27 @@ let
       }
     ) rawAgents;
 
-  # mkRawCommandMetadata :: rawCommands -> { <command-key> = { name, reference }; }
+  # mkRawCommandMetadata :: self -> rawCommands -> { <command-key> = { name, reference }; }
   #   Safe raw-phase command surface for source functions. It intentionally uses
   #   only declaration keys and authored names, never processed command content,
   #   so command references can fail on rename without creating renderer cycles.
   mkRawCommandMetadata =
-    rawCommands:
+    self: rawCommands:
     lib.mapAttrs (
       key: data:
       let
         name = if builtins.isAttrs data && builtins.hasAttr "name" data then data.name else key;
+        kind =
+          if
+            builtins.isAttrs data && builtins.hasAttr "asSkill" data && isEnabledForHarness self data.asSkill
+          then
+            "skill"
+          else
+            "command";
       in
       {
         inherit name;
-        reference = "(See command: ${name})";
+        reference = mkReference kind name;
       }
     ) rawCommands;
 
@@ -494,7 +502,7 @@ let
 
   mkRawSkillReference = name: {
     inherit name;
-    reference = "(See skill: ${name})";
+    reference = mkReference "skill" name;
   };
 
   isRawAsSkillDeclared =

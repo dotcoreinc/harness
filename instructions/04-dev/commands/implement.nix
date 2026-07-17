@@ -17,7 +17,7 @@
 
         1. 🔳 Verify 10/10 understanding.
            - Read ALL requirements in project doc
-           - If unclear, ask user to ${scope.commands."ctx-improve".reference}
+           - If unclear, ask user to use ${scope.commands."ctx-improve".reference}
            - Clarify if task contradicts or overlaps
 
         2. 🔳 Load tasks from project/phase docs

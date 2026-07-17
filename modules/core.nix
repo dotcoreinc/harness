@@ -93,9 +93,29 @@ let
     test -f ${rendered.package}/opencode/AGENTS.md
     test -d ${rendered.package}/claude/commands
     test -d ${rendered.package}/opencode/commands
+    grep -Fx '7. 🔳 Run the `proj-save` command to update project and phase docs' ${rendered.package}/claude/commands/implement.md
+    grep -Fx '7. 🔳 Run the `proj-save` skill to update project and phase docs' ${rendered.package}/opencode/commands/implement.md
     grep -F '# Main instructions' ${rendered.package}/claude/CLAUDE.md
     grep -F '# Main instructions' ${rendered.package}/opencode/AGENTS.md
     grep -F 'todowrite' ${rendered.package}/opencode/AGENTS.md
+    test -f ${rendered.package}/claude/agents/mid-dev.md
+    test -f ${rendered.package}/opencode/agents/mid-dev.md
+    test -f ${rendered.package}/claude/agents/senior-dev.md
+    test -f ${rendered.package}/opencode/agents/senior-dev.md
+    grep -Fx 'model: "sonnet"' ${rendered.package}/claude/agents/mid-dev.md
+    grep -Fx 'model: "sonnet"' ${rendered.package}/claude/agents/senior-dev.md
+    grep -Fx 'model: "openai/gpt-5.6-luna"' ${rendered.package}/opencode/agents/mid-dev.md
+    grep -Fx 'reasoningEffort: "xhigh"' ${rendered.package}/opencode/agents/mid-dev.md
+    grep -Fx 'model: "openai/gpt-5.6-terra"' ${rendered.package}/opencode/agents/senior-dev.md
+    grep -Fx 'reasoningEffort: "high"' ${rendered.package}/opencode/agents/senior-dev.md
+    if grep -Eq '^effort:' ${rendered.package}/claude/agents/mid-dev.md; then
+      echo 'unexpected effort field in rendered Claude mid-dev agent' >&2
+      exit 1
+    fi
+    if grep -Eq '^effort:' ${rendered.package}/claude/agents/senior-dev.md; then
+      echo 'unexpected effort field in rendered Claude senior-dev agent' >&2
+      exit 1
+    fi
     grep -F '${versionControlMarkers.expected}' ${rendered.package}/claude/rules/version-control.md
     grep -F '${versionControlMarkers.expected}' ${rendered.package}/opencode/rules/version-control.md
     if grep -F '${versionControlMarkers.unexpected}' ${rendered.package}/claude/rules/version-control.md; then

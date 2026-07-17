@@ -382,7 +382,7 @@ let
     {
       name = "source-set command asSkill exposes raw skill reference";
       pass =
-        lib.hasInfix "Feature skill reference: (See skill: feature-cmd)"
+        lib.hasInfix "Feature skill reference: the `feature-cmd` skill"
           featureScope.commands."uses-feature-skill-ref".embed;
       detail = "expected command-derived skills from source-set functions to be available through scope.skills metadata";
     }

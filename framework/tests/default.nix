@@ -7,6 +7,10 @@ let
       result = (import ./frontmatter.nix).allPass;
     }
     {
+      name = "agents";
+      result = (import ./agents.nix { inherit pkgs lib; }).allPass;
+    }
+    {
       name = "dual-output";
       result = (import ./dual-output.nix { inherit pkgs lib; }).allPass;
     }

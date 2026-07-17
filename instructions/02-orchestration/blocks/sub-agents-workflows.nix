@@ -30,6 +30,7 @@
 
           * Agent selection: select right sub-agent for task, each have different pricing and need to optimize for it. Avoid using explore/general/plan agents, select proper dev agent instead. Prioritize using more senior implementation agents for high level planning, use principal-dev only for top-tier insights/advisory escalation, then more junior executing that plan.
             * junior-dev: ${scope.agents."junior-dev".description}
+            * mid-dev: ${scope.agents."mid-dev".description}
             * senior-dev: ${scope.agents."senior-dev".description}
             * staff-dev: ${scope.agents."staff-dev".description}
             * principal-dev: ${scope.agents."principal-dev".description}

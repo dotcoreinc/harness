@@ -18,9 +18,9 @@
           }, don't attempt create without that procedure. This creates proper symlink (`proj`)  and initial project file (`proj/00-<name>.md`).
           - Phase docs (`proj/NN-<phas>.md`) created mainly via ${
             scope.commands."proj-plan".reference
-          }, but can be created adhoc on user request. If phase doc unrelated to new work, ask user if split. Updated on task complete, on ${
+          }, but can be created adhoc on user request. If phase doc unrelated to new work, ask user if split. Updated on task complete, when ${
             scope.commands."proj-save".reference
-          } call, significant new info, uncertainties, decisions, insights, etc.
+          } is run, significant new info, uncertainties, decisions, insights, etc.
 
           ## Version control
           - Keep the `proj` symlink in own commit named `private: proj - <project-name>`
