@@ -35,8 +35,9 @@
           - Instructions should be for steering and routing, no duplication information from code. Code is source of truth, while instructions/docs can easily rot as they aren't compiled/refactored as easily.
           - When steering, prefer mentioning what to do and reason to do so, instead of what not to do. What not to do can help on repeated failures.
           - Instructions must be clear, unambiguous, complete and imperative.
-          - Instructions must be concise, avoid repetitions as they consume context tokens. You need to sacrifice style/syntax/proze for brevity.
-          - Repetitions must be avoided across instructions. Do reconnaisance first. Propose or use reusable blocks.
+          - Default terse instruction fragments, not prose; sacrifice articles/transitions/repetition/grammar when meaning stays clear.
+          - When editing instructions: preserve local syntax/style, change only requested wording; no surrounding fluency rewrites.
+          - One authoritative location per policy; reference/embed elsewhere. Do reconnaissance first, propose or use reusable blocks.
           - Checklists should be block rendered as xml tag for higher recall salience.
           - Empty lines are automatically removed by renderer, so you can use them for readability in source files. Avoid multi-lines wrapping as they consume uncessary tokens on indented lines.
           - When writing procedures with step by steps, push LLM to use ${
@@ -45,12 +46,14 @@
 
           ## Instructions writing
 
+          - Before edit: identify authoritative source and smallest sufficient diff.
           - Which instruction to edit should be based on context. If not clear what/where to edit, STOP and ask user.
           - You may not be able to edit them directly either if you're in a sandbox. If that's the case, tell the user and give a detailed description of changes that need to be done.
           - Load similar/surrounding instruction files for patterns.
           - Do reconnaissance, find edit locations and then propose edit plan to user.
           - If you spent too much time finding information about nixantic or dotfiles setup, propose changes to dotfiles CLAUDE.md's.
           - If user agrees, proceed with edits.
+          - After edit: diff-review added prose, duplicated policy, unnecessary rewording, scope expansion; remove before finish.
           - Regenerate instructions after edits using repo's check&build commands.
         '';
       };
