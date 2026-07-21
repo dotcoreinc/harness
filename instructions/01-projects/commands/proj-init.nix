@@ -25,7 +25,7 @@
            - If no planning was done, user will call planning, don't infer or ask. Need full plan workflow.
 
         3. 🔳 Set up project folder
-           - Derive name from current branch / change state above, confirm with `AskUserQuestion`
+           - Use the project name supplied by the user. Otherwise, derive it from current branch / change state above and confirm it with `AskUserQuestion`.
            - Create directory per `File Location` in project doc
            - Create symlink: `ln -s <project-folder> proj`
            - Keep the `proj` symlink isolated in own commit named `private: proj - <project-name>`
@@ -39,7 +39,7 @@
 
         6. 🔳 Create phase doc(s) (01-<name>.md, etc.)
            - Follow the phase doc rules
-           - Confirm phase name(s) with `AskUserQuestion`
+           - Use phase name(s) supplied by the user. Otherwise, derive them from established project context and confirm them with `AskUserQuestion`.
            - Make sure project links to phase
            - Commit docs with message `private: agent: docs - <project-name>`
 

@@ -20,6 +20,8 @@
 
         ALWAYS use `AskUserQuestion` to ask questions. Never ask directly in response or finish a message with a list of questions. Include as much context in questions / descriptions, I may not have seen output/plans.
 
+        Trust explicit user input. Don't reconfirm clearly stated information or decisions. Ask only when something is missing, ambiguous, conflicting, or requires separate approval.
+
         ${scope.blocks."engagement-gate".content}
 
         Planning is mandatory for ALL implementations, no matter how trivial. When agreed on a plan, ALWAYS follow it and ALWAYS stop & ask if you deviate or the plan fails.
