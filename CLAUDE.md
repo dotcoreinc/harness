@@ -42,4 +42,5 @@ Treat both parts as first-class. The repo builds and validates them together, th
 ## Verify before you finish
 
 - Run `nix flake check --show-trace` for final verification.
-- Use `nix build .#builtin`, `nix build .#claude`, and `nix build .#opencode` for focused instructions and wrapper checks while iterating.
+- `nix build .#builtin`: rendered instructions in `result/{claude,opencode}`.
+- `nix build .#claude` / `.#opencode`: CLI launchers with built-in instructions.

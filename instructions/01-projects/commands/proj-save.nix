@@ -18,7 +18,7 @@
 
         1. Ensure ${scope.skills."proj-writing".reference} loaded.
 
-        2. 🔳 Note `proj` symlink from state above. Identify current phase from checkpoint or ask user
+        2. 🔳 Note the active project link (`proj` or `proj-adhoc`) from state above. Identify current phase from checkpoint or ask user
 
         3. 🔳 Update current phase doc(s)
            * Requirements
@@ -60,7 +60,7 @@
              * Keep short like project docs mention
 
         6. 🔳 Commit doc changes
-           * Use the project doc version control guidelines
+           * Follow the project doc version control guidelines: commit doc changes only for committed `proj`; never commit `proj-adhoc`, its temporary target, or its documents.
       '';
     };
 }

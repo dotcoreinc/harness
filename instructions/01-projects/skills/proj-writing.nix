@@ -10,24 +10,22 @@
           # Project & phase documentation writing skill
 
           Docs updated continuously as we plan, develop, review, etc.. Because context window ephemeral while docs durable. Should show history, append/amend, not rewrite.
-          Update docs via the symlink (`./proj`) as permissions may only allow that.
+          Update docs via the active project link (`proj` or `proj-adhoc`) reported by project state, as permissions may only allow that.
 
           ## Project docs creation
-          - Should always be done via ${
-            scope.commands."proj-init".reference
-          }, don't attempt create without that procedure. This creates proper symlink (`proj`)  and initial project file (`proj/00-<name>.md`).
-          - Phase docs (`proj/NN-<phas>.md`) created mainly via ${
-            scope.commands."proj-plan".reference
-          }, but can be created adhoc on user request. If phase doc unrelated to new work, ask user if split. Updated on task complete, when ${
+          - Create project and phase files only when an active user-invoked workflow explicitly directs creation; do not create them independently.
+          - If no active creation workflow directs creation, stop and ask the user to invoke an appropriate project workflow.
+          - If a phase doc is unrelated to new work, ask the user if it should be split. Update docs on task completion, when ${
             scope.commands."proj-save".reference
           } is run, significant new info, uncertainties, decisions, insights, etc.
 
           ## Version control
-          - Keep the `proj` symlink in own commit named `private: proj - <project-name>`
+          - For committed projects, keep the `proj` symlink in its own commit named `private: proj - <project-name>`
             - Contains the symlink file only. Never mix doc changes into it.
-          - Keep doc file changes (00-*.md, 01-*.md, etc.) in dedicated doc-only commit prefixed `private: agent: docs -`
+          - For committed projects, keep doc file changes (00-*.md, 01-*.md, etc.) in a dedicated doc-only commit prefixed `private: agent: docs -`
             - Only doc files, no code or symlink.
             - Follow the repository version control rule for the exact workflow.
+          - Never commit `proj-adhoc`, its temporary target, or its project and phase documents.
 
           ## Overall writing rules
           - Clear, concise, informative.

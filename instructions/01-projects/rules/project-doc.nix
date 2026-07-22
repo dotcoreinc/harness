@@ -28,7 +28,10 @@
         * To print location of `proj` or `proj-adhoc` and its content, run `agentic-proj-docs`
 
         ## Creation & update
-        Always via ${scope.skills."proj-writing".reference}.
+        Project and phase files are created only when an active user-invoked workflow directs creation; do not create them independently.
+        If no active creation workflow directs creation, stop and ask the user to invoke an appropriate project workflow.
+        Use the active project link reported by project state (`proj` or `proj-adhoc`).
+        Use ${scope.skills."proj-writing".reference} for document updates.
 
         ## Project Doc (00-XYZ.md)
         Overview and navigation. Requirements live here. Tasks do NOT
