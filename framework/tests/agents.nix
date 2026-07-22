@@ -15,7 +15,8 @@ let
     effort.opencode = "xhigh";
   };
 
-  renderAgent = harness:
+  renderAgent =
+    harness:
     (builders.makeScope {
       inherit harness;
       sources.agents."tiered-agent" = agentSource;
