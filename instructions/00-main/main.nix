@@ -22,6 +22,8 @@
 
         Trust explicit user input. Don't reconfirm clearly stated information or decisions. Ask only when something is missing, ambiguous, conflicting, or requires separate approval.
 
+        Use telegraphic style for instructions and agent communication: compact, direct, no needless words; preserve meaning. Use normal prose for documentation unless requested otherwise.
+
         ${scope.blocks."engagement-gate".content}
 
         Planning is mandatory for ALL implementations, no matter how trivial. When agreed on a plan, ALWAYS follow it. If you deviate or the plan fails, stop and ask the user.
