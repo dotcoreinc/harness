@@ -179,6 +179,27 @@ let
     };
   };
 
+  scopedAgentReferenceScope = mkScope {
+    sources = optionBase // {
+      agents = {
+        scoped =
+          { scope }:
+          {
+            description = "Scoped agent description";
+            content = "Scoped agent uses ${scope.blocks."pre-flight".reference}.";
+          };
+      };
+      commands = {
+        "uses-scoped-agent" =
+          { scope }:
+          {
+            description = "Command referencing a scoped agent";
+            content = "Use ${scope.agents.scoped.description}; ${scope.agents.scoped.reference}.";
+          };
+      };
+    };
+  };
+
   missingAgentReferenceResult = builtins.tryEval (
     (mkScope {
       sources = optionBase // {
@@ -621,6 +642,14 @@ let
           agentReferenceScope.commands."uses-agents".embed
         && agentReferenceScope.agents.target.reference == "(See agent: target)";
       detail = "expected source functions to reference raw agent metadata";
+    }
+    {
+      name = "raw agent references support scoped agents";
+      pass =
+        lib.hasInfix "Use Scoped agent description; (See agent: scoped)."
+          scopedAgentReferenceScope.commands."uses-scoped-agent".embed
+        && lib.hasInfix "Scoped agent uses (See: Pre Flight)." scopedAgentReferenceScope.agents.scoped.embed;
+      detail = "expected raw metadata extraction to preserve function-valued agent declarations";
     }
     {
       name = "missing raw agent reference fails";

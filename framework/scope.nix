@@ -95,7 +95,7 @@ let
     self:
     let
       selectedSources = ensureSourceDefaults self.sources;
-      rawAgentMetadata = mkRawAgentMetadata selectedSources.agents;
+      rawAgentMetadata = mkRawAgentMetadata self selectedSources.agents;
       rawCommandMetadata = mkRawCommandMetadata self self.rawCommands;
       rawSkillMetadata = mkRawSkillMetadata self.rawSkills self.rawCommands;
     in
@@ -187,7 +187,7 @@ let
                 if subData.kind == "nix" then
                   self.scopeApi.mkSkillFile {
                     content =
-                      applySource self (mkRawAgentMetadata self.rawAgents) (mkRawCommandMetadata self self.rawCommands)
+                      applySource self (mkRawAgentMetadata self self.rawAgents) (mkRawCommandMetadata self self.rawCommands)
                         (mkRawSkillMetadata self.rawSkills self.rawCommands)
                         subData.content;
                     outputPath = fullPath;
@@ -422,20 +422,29 @@ let
 
   ensureSourceDefaults = sources: emptySources // sources;
 
-  # mkRawAgentMetadata :: rawAgents -> { <agent-key> = { name, description, reference }; }
+  # mkRawAgentMetadata :: self -> rawAgents -> { <agent-key> = { name, description, reference }; }
   #   Safe raw-phase agent surface for source functions. It intentionally uses
   #   only declaration keys and authored metadata, never rendered or processed
   #   agent content, so agent references can be reused without renderer cycles.
   mkRawAgentMetadata =
-    rawAgents:
+    self: rawAgents:
+    let
+      metadataScope = self // {
+        agents = throw "Nixantic agent declarations must not reference scope.agents while raw metadata is being collected";
+        commands = throw "Nixantic agent declarations must not reference scope.commands while raw metadata is being collected";
+        skills = throw "Nixantic agent declarations must not reference scope.skills while raw metadata is being collected";
+        instructions = throw "Nixantic agent declarations must not reference scope.instructions while raw metadata is being collected";
+      };
+    in
     lib.mapAttrs (
       key: data:
       let
-        isAttrDeclaration = builtins.isAttrs data;
-        name = if isAttrDeclaration && builtins.hasAttr "name" data then data.name else key;
+        declaration = if builtins.isFunction data then data { scope = metadataScope; } else data;
+        isAttrDeclaration = builtins.isAttrs declaration;
+        name = if isAttrDeclaration && builtins.hasAttr "name" declaration then declaration.name else key;
         description =
-          if isAttrDeclaration && builtins.hasAttr "description" data then
-            data.description
+          if isAttrDeclaration && builtins.hasAttr "description" declaration then
+            declaration.description
           else
             throw "Nixantic raw agent metadata for '${key}' requires an authored description";
       in

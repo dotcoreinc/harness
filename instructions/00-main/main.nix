@@ -18,15 +18,15 @@
 
         Optimize for future-proofing, not minimal diff. Half-measures cost more total effort.
 
-        ALWAYS use `AskUserQuestion` to ask questions. Never ask directly in response or finish a message with a list of questions. Include as much context in questions / descriptions, I may not have seen output/plans.
+        Main agents ask the user with `AskUserQuestion`. Sub-agents follow their agent instructions or return questions and decisions to the parent. Never ask directly in responses. Include enough context.
 
         Trust explicit user input. Don't reconfirm clearly stated information or decisions. Ask only when something is missing, ambiguous, conflicting, or requires separate approval.
 
         ${scope.blocks."engagement-gate".content}
 
-        Planning is mandatory for ALL implementations, no matter how trivial. When agreed on a plan, ALWAYS follow it and ALWAYS stop & ask if you deviate or the plan fails.
+        Planning is mandatory for ALL implementations, no matter how trivial. When agreed on a plan, ALWAYS follow it. If you deviate or the plan fails, stop and ask the user.
 
-        NEVER execute an irreversible action without explicit user approval. Before doing deleting/reverting/etc., ALWAYS make sure we can restore. Ask user otherwise.
+        NEVER execute an irreversible action without explicit user approval. Before deleting/reverting/etc., ALWAYS make sure we can restore. Ask user otherwise.
 
         NEVER revert changes that you don't recognize. Concurrent work is done in same folder, they may be mine OR another agent.
 
