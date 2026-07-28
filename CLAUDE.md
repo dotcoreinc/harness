@@ -30,7 +30,7 @@ Treat both parts as first-class. The repo builds and validates them together, th
 - When you change README examples or exported behavior, verify them against `flake.nix`, `modules/`, and `checks/default.nix`.
 - Prefer changes in source fragments and renderer code over edits to rendered artifacts.
 - Before creating or editing instructions, agents, commands, skills, rules, `CLAUDE.md`, or `AGENTS.md`, load and follow the `mem-writing` skill.
-- Don't add tests for instruction-only wording/policy edits; test only changes to instruction structure, rendering/transformation, schemas, or executable behavior.
+- Tests cover Nixantic framework behavior (rendering/transformation, schemas, and executable behavior), not specific built-in instruction wording, structure, references, or policy. Validate built-in instruction changes by rendering and inspection.
 - Keep this file short. Do not restate code or README content unless it changes agent behavior.
 
 ## Watch the source-tree contract

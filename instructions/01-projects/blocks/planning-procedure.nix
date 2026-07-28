@@ -20,7 +20,7 @@
         - Consider dependencies and challenges
 
         - Breakdown in tasks, with ACs, dependencies
-        - Select agent that will accomplish each task (junior, senior or staff)
+        - Select the agent for each task using ${scope.blocks.sub-agent-selection.reference}
         - Include testing as tasks for autonomous iteration using ${scope.blocks.testing-principles.reference}
       '';
     };

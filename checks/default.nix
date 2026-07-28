@@ -123,6 +123,32 @@ in
     touch $out
   '';
 
+  agent-selection-routing = pkgs.runCommand "nixantic-agent-selection-routing-check" { } ''
+    for harness in claude opencode; do
+      root=${coreEval.config.nixantic.instructions.package}/$harness
+      orchestration="$root/rules/orchestration.md"
+
+      workflow_open=$(grep -n -m1 '^<sub-agents-workflows>$' "$orchestration" | cut -d: -f1)
+      selection_open=$(grep -n -m1 '^<sub-agent-selection>$' "$orchestration" | cut -d: -f1)
+      selection_close=$(grep -n -m1 '^</sub-agent-selection>$' "$orchestration" | cut -d: -f1)
+      workflow_close=$(grep -n -m1 '^</sub-agents-workflows>$' "$orchestration" | cut -d: -f1)
+      test "$workflow_open" -lt "$selection_open"
+      test "$selection_open" -lt "$selection_close"
+      test "$selection_close" -lt "$workflow_close"
+
+      grep -F 'Select the agent for each task using <sub-agent-selection>' "$root/commands/ctx-plan.md"
+      grep -F 'Select the agent for each task using <sub-agent-selection>' "$root/commands/proj-plan.md"
+      grep -F 'select it using <sub-agent-selection>' "$root/skills/proj-writing/SKILL.md"
+      grep -F 'reselect using <sub-agent-selection>' "$root/commands/implement.md"
+
+      grep -F 'Use <sub-agents-workflows> for exploration, research and investigation' "$root/commands/ctx-plan.md"
+      grep -F 'Use <sub-agents-workflows> for exploration, research and investigation' "$root/commands/proj-plan.md"
+      grep -F 'Use <sub-agents-workflows> for exploration, research and investigation' "$root/commands/ctx-improve.md"
+      grep -F 'You need to follow <sub-agents-workflows>' "$root/commands/implement.md"
+    done
+    touch $out
+  '';
+
   git-export-variants = pkgs.runCommand "nixantic-git-export-variants-check" { } ''
     test -f ${gitCoreEval.config.nixantic.instructions.package}/claude/CLAUDE.md
     test -f ${gitCoreEval.config.nixantic.instructions.package}/opencode/AGENTS.md

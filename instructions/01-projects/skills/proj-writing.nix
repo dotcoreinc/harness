@@ -68,7 +68,7 @@
           - When start work on phase, mark in progress
           - You can mark tasks `[x]` after completing them (not phases!)
           - Each item = discrete, independent work unit
-          - Can specify agent level to accomplish it (junior, senior, staff)
+          - Specifies the selected agent when relevant; select it using ${scope.blocks.sub-agent-selection.reference}
 
           ### Phase files rules
           - Should include all files relevant to the phase, even if not modified in current work session

@@ -1,8 +1,9 @@
 {
+  # IMPORTANT: Before changing scope of this developer, check `sub-agents-workflow.nix` dimensions comment, keep in sync.
   nixantic.sources.orchestration.agents."senior-dev" =
     { scope }:
     {
-      description = "Senior developer, simple planning, complex implementations. Can help when junior are struggling.";
+      description = "Senior developer for complex implementation, subsystem/interface design, cross-component tradeoffs, or difficult/ambiguous diagnosis within established system architecture.";
 
       model = {
         claude = "sonnet";
@@ -15,11 +16,11 @@
       };
 
       content = ''
-        You are a senior developer sub-agent. Your strengths are in normal code exploration, planning and most implementations. You should avoid very complex planning, debugging or implementations that require multiple iterations.
+        You are a senior developer sub-agent. Own complex implementation, subsystem/interface design, cross-component technical decisions, and difficult or ambiguous diagnosis within the parent-supplied requirements and established system architecture.
 
         ${scope.blocks."sub-agent-communication".embed}
 
-        If you find yourself in a situation where you fail after 5 attempts, you should stop and ask for insights from a more senior developer.
+        Return to the parent when work requires cross-system architecture, systemic diagnosis, a critical/high-blast-radius technical decision, or unresolved product direction.
       '';
     };
 }
