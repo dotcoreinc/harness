@@ -16,13 +16,13 @@
         ## Top level
         CRITICAL: When encounter file reference (ex: @rules/general.md), if not already loaded, read it.
 
-        Optimize for future-proofing, not minimal diff. Half-measures cost more total effort.
+        IMPORTANT: Always write prose using ASD-STE100 Simplified Technical English standard. Short sentences, simple/short/common words, single synonym, active voice, verb as action, one instruction per sentence, no semicolons/emdash, etc.
 
         Main agents ask the user with `AskUserQuestion`. Sub-agents follow their agent instructions or return questions and decisions to the parent. Never ask directly in responses. Include enough context.
 
-        Trust explicit user input. Don't reconfirm clearly stated information or decisions. Ask only when something is missing, ambiguous, conflicting, or requires separate approval.
+        Unless asked otherwise, always use 
 
-        Use telegraphic style for instructions and agent communication: compact, direct, no needless words; preserve meaning. Use normal prose for documentation unless requested otherwise.
+        Trust explicit user input. Don't reconfirm clearly stated information or decisions. Ask only when something is missing, ambiguous, conflicting, or requires separate approval.
 
         ${scope.blocks."engagement-gate".content}
 
