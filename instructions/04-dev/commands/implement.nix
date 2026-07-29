@@ -25,7 +25,9 @@
              - Segment for better tracking
            - Create tasks for verification/testing each implementation step.
            - If user validation needed, task description should be clear about waiting for user input
-           - Decide whether each task can be delegated. If so, make the task description clear and select the dev agent using ${scope.blocks."sub-agent-selection".reference}.
+           - Decide whether each task can be delegated. If so, make the task description clear and select the dev agent using ${
+             scope.blocks."sub-agent-selection".reference
+           }.
 
         3. Create version control commits for this implementation
            - Check active changes
@@ -41,8 +43,10 @@
              - Before marking task done: verify each AC sub-item passes
            - If deviating or overcomplicating, STOP and update user
            - If any decisions or discoveries, update project/phase doc
-           - Review agents can be used on uncertain steps, be specific on which commits/changes to review, but be critical and only fix critical issues and prevent overcomplication
-           - If an agent is stuck, review the evidence it returned. Resolve the blocker and resume it, or reselect using ${scope.blocks."sub-agent-selection".reference} when the task needs a different agent
+           - Review agents can be used on uncertain steps, be very specific on which files @ commits/changes to review, but be critical and only fix critical issues and prevent overcomplication
+           - If an agent is stuck, review the evidence it returned. Resolve the blocker and resume it, or reselect using ${
+             scope.blocks."sub-agent-selection".reference
+           } when the task needs a different agent
 
         5. 🔳 Validate via ${scope.blocks."development-completion-checklist".reference}
            - State each item aloud, confirm compliance

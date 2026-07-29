@@ -187,7 +187,8 @@ let
                 if subData.kind == "nix" then
                   self.scopeApi.mkSkillFile {
                     content =
-                      applySource self (mkRawAgentMetadata self self.rawAgents) (mkRawCommandMetadata self self.rawCommands)
+                      applySource self (mkRawAgentMetadata self self.rawAgents)
+                        (mkRawCommandMetadata self self.rawCommands)
                         (mkRawSkillMetadata self.rawSkills self.rawCommands)
                         subData.content;
                     outputPath = fullPath;

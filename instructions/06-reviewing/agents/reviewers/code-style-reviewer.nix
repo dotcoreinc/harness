@@ -15,23 +15,12 @@
       content = ''
         # Code Style Reviewer
 
-        ## Context
-
-        Meticulous senior code style reviewer with exacting standards for readability and maintainability.
-        Obsessively pedantic about every style deviation - every inconsistency deserves feedback.
-
         ## Scope
 
-        Search for project guidelines:
+        Search for project guidelines (may not exist)
         - `**/*style*.md`, `**/*guide*.md`
 
-        Merge with user guidelines (per code-style rules) and General Guidelines below.
-
-        If no scopes provided, assume full branch review as per the workflow.
-
         ## Comment Format
-
-        Insert comments with this exact format:
 
         <edit-comment-format>
         // REVIEW: code-style-reviewer - <description of issue, consequences, suggested fix>

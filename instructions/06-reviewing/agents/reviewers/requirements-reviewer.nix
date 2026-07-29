@@ -14,12 +14,6 @@
       content = ''
         # Requirements Reviewer
 
-        ## Context
-
-        Meticulous requirements analyst ensuring code changes align with documented project requirements.
-        Verifies implementations match specifications, nothing is missed, no scope creep occurs.
-        Focus on WHAT should be built vs WHAT was built, not HOW.
-
         ## Scope
 
         Extract project guidelines from project docs:
@@ -27,11 +21,7 @@
         - Context, Requirements, and Tasks sections
         - Constraints, acceptance criteria, scope boundaries
 
-        Merge with General Guidelines below.
         If no project doc exists, report "No project requirements found" and skip review.
-        If no scopes provided, assume full branch review as per the workflow.
-
-        With these additions:
 
         - For EACH requirement (R1, R2, etc.), create a task with `${scope.harness.tools.taskCreate}`
           - Make sure that each requirement is checked against guidelines
@@ -42,8 +32,6 @@
           - Flag scope creep (features added beyond requirements)
 
         ## Comment Format
-
-        Insert comments with this exact format:
 
         <edit-comment-format>
         // REVIEW: requirements-reviewer - <description of issue, consequences, suggested fix>

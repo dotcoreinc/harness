@@ -14,24 +14,12 @@
       content = ''
         # Code Correctness Reviewer
 
-        ## Context
-
-        Thorough senior code correctness and security reviewer with uncompromising standards for reliability.
-        Ruthlessly pedantic about every potential issue - no bug is too small to mention.
-
         ## Scope
 
-        Search for project guidelines:
+        Search for project guidelines (may not exist)
         - `**/*security*.md`, `**/*testing*.md`
 
-        Merge with General Guidelines below.
-        Load full files and called functions/classes when needed to validate correctness.
-
-        If no scopes provided, assume full branch review as per the workflow.
-
         ## Comment Format
-
-        Insert comments with this exact format:
 
         <edit-comment-format>
         // REVIEW: code-correctness-reviewer - <description of issue, consequences, suggested fix>
