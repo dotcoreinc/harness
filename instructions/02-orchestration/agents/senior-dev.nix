@@ -6,13 +6,14 @@
       description = "Senior developer for complex implementation, subsystem/interface design, cross-component tradeoffs, or difficult/ambiguous diagnosis within established system architecture.";
 
       model = {
-        claude = "sonnet";
-        opencode = "openai/gpt-5.6-terra";
-      };
-
-      effort = {
-        claude = "high";
-        opencode = "high";
+        claude = {
+          model = "sonnet";
+          effort = "high";
+        };
+        opencode = {
+          model = "openai/gpt-5.6-terra";
+          effort = "high";
+        };
       };
 
       content = ''

@@ -4,6 +4,7 @@
   #   - Exploration: Primary agent for code exploration and factual lookup.
   #   - Implementation and decisions: Deterministic, low-risk mechanical details only; no behavior, scope, design, requirement, plan, or prose-meaning decisions.
   #   - Diagnosis: None.
+  #   - Version control: Read-only inspection only; no write operations or conflict resolution.
   #   - Risk and ownership: Low risk; return any required judgment or diagnosis.
   # - Mid
   #   - Exploration: Inseparable from Mid-level implementation.

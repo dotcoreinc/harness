@@ -10,9 +10,11 @@ let
     content = "Agent body";
     model = {
       claude = "sonnet";
-      opencode = "openai/gpt-5.6-luna";
+      opencode = {
+        model = "openai/gpt-5.6-luna";
+        effort = "xhigh";
+      };
     };
-    effort.opencode = "xhigh";
   };
 
   renderAgent =
@@ -48,14 +50,14 @@ let
 
   cases = [
     {
-      name = "Claude agent selects its model and omits OpenCode-only effort";
+      name = "Claude agent selects its model from string and omits OpenCode-only effort";
       pass = claudeAgent == claudeExpected;
       detail = "expected Claude sonnet model with no effort field";
     }
     {
-      name = "OpenCode agent selects its model effort and subagent mode";
+      name = "OpenCode agent selects its model and effort from nested attrset";
       pass = opencodeAgent == opencodeExpected;
-      detail = "expected OpenCode selects its model, effort, and subagent mode";
+      detail = "expected OpenCode selects its model from nested model attrset, and effort, and subagent mode";
     }
   ];
 

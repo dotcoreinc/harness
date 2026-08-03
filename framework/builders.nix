@@ -28,7 +28,7 @@ let
     reference = "(See: ${args.heading})";
   };
 
-  # mkAgent :: { harness, name, description, content, model?, effort?, permission?, harnesses?, ... }
+  # mkAgent :: { harness, name, description, content, model?, permission?, harnesses?, ... }
   #   AI agent definitions.
   #   Source: nixantic.sources.<source-owner>.agents.*, keyed by artifact key.
   #
@@ -38,13 +38,11 @@ let
   #
   #   Optional (authored)
   #     name         - Display name. Defaults to filename stem.
-  #     model        - Attrset keyed by harness name (e.g. { claude = "sonnet"; }).
-  #                    Constructor selects model.<active-harness> or null.
-  #     effort       - Thinking/reasoning effort level. Can be:
-  #                    - String: same value for all harnesses (e.g. "high")
-  #                    - Attrset: keyed by harness name (e.g. { claude = "max"; opencode = "xhigh"; })
-  #                    Constructor selects effort.<active-harness> or uses the string as-is.
-  #                    Harness-rendered: Claude renders as `effort`; OpenCode renders as `reasoningEffort`.
+  #     model        - Attrset keyed by harness name. Each value can be:
+  #                    - String: model name only (e.g. { claude = "sonnet"; opencode = "gpt-4"; })
+  #                    - Attrset: { model = "..."; effort = "..."; } (e.g. { claude = { model = "sonnet"; effort = "high"; }; })
+  #                    Constructor selects model.<active-harness> and extracts model and optional effort.
+  #                    Harness-rendered: Claude renders as `model` and `effort`; OpenCode renders as `model` and `reasoningEffort`.
   #     permission   - Attrset keyed by harness name (e.g. { claude = { disallowedTools = [ "Agent" ]; }; }).
   #                    Constructor selects permission.<active-harness> or null.
   #
@@ -60,13 +58,26 @@ let
     args:
     let
       model = args.model or null;
-      selectedModel = if model != null then model.${args.harness.name} or null else null;
-      effort = args.effort or null;
-      selectedEffort =
-        if effort != null then
-          if builtins.isAttrs effort then effort.${args.harness.name} or null else effort
+      selectedHarnessValue = if model != null then model.${args.harness.name} or null else null;
+
+      # Parse model value: can be string (model-only) or attrset (model + effort)
+      selectedModel =
+        if selectedHarnessValue != null then
+          if builtins.isString selectedHarnessValue then
+            selectedHarnessValue
+          else if builtins.isAttrs selectedHarnessValue then
+            selectedHarnessValue.model or null
+          else
+            null
         else
           null;
+
+      selectedEffort =
+        if selectedHarnessValue != null && builtins.isAttrs selectedHarnessValue then
+          selectedHarnessValue.effort or null
+        else
+          null;
+
       permission = args.permission or null;
       selectedPermission = if permission != null then permission.${args.harness.name} or null else null;
       frontmatter = args.harness.renderAgentFrontmatter {
@@ -96,8 +107,11 @@ let
   #   Optional (authored)
   #     name         - Display name. Defaults to directory name (skills) or
   #                    filename stem (commands).
-  #     model        - Attrset keyed by harness name. Selects model.<active-harness>
-  #                    or null.
+  #     model        - Attrset keyed by harness name. Each value can be:
+  #                    - String: model name only
+  #                    - Attrset: { model = "..."; effort = "..."; }
+  #                    Constructor selects model.<active-harness> and extracts model and optional effort.
+  #                    Harness-rendered: Claude renders as `model` and `effort`; OpenCode renders as `model` and `reasoningEffort`.
   #
   #   Frontmatter — skill (kind="directory"):
   #     Both harnesses:  name, description, metadata
@@ -126,7 +140,26 @@ let
     let
       kind = args.kind or "flat";
       model = args.model or null;
-      selectedModel = if model != null then model.${args.harness.name} or null else null;
+      selectedHarnessValue = if model != null then model.${args.harness.name} or null else null;
+
+      # Parse model value: can be string (model-only) or attrset (model + effort)
+      selectedModel =
+        if selectedHarnessValue != null then
+          if builtins.isString selectedHarnessValue then
+            selectedHarnessValue
+          else if builtins.isAttrs selectedHarnessValue then
+            selectedHarnessValue.model or null
+          else
+            null
+        else
+          null;
+
+      selectedEffort =
+        if selectedHarnessValue != null && builtins.isAttrs selectedHarnessValue then
+          selectedHarnessValue.effort or null
+        else
+          null;
+
       optional = name: args.${name} or null;
       frontmatter =
         if kind == "directory" then
@@ -134,7 +167,7 @@ let
             inherit (args) name description;
             argumentHint = optional "argumentHint";
             metadata = optional "metadata";
-            effort = optional "effort";
+            effort = selectedEffort;
             context = optional "context";
             agent = optional "agent";
             allowedTools = optional "allowedTools";
@@ -147,7 +180,7 @@ let
           args.harness.renderCommandFrontmatter {
             inherit (args) name description;
             argumentHint = optional "argumentHint";
-            effort = optional "effort";
+            effort = selectedEffort;
             context = optional "context";
             agent = optional "agent";
             allowedTools = optional "allowedTools";
@@ -194,8 +227,11 @@ let
   #
   #   Optional (authored)
   #     name         - Display name. Defaults to filename stem.
-  #     model        - Attrset keyed by harness name. Selects model.<active-harness>
-  #                    or null.
+  #     model        - Attrset keyed by harness name. Each value can be:
+  #                    - String: model name only
+  #                    - Attrset: { model = "..."; effort = "..."; }
+  #                    Constructor selects model.<active-harness> and extracts model and optional effort.
+  #                    Harness-rendered: Claude renders as `model` and `effort`; OpenCode renders as `model` and `reasoningEffort`.
   #
   #   Frontmatter (command, kind="flat"):
   #     Both harnesses:  description, model, agent

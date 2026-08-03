@@ -7,11 +7,10 @@
 
       model = {
         claude = "fable";
-        opencode = "openai/gpt-5.6-sol";
-      };
-
-      effort = {
-        opencode = "xhigh";
+        opencode = {
+          model = "openai/gpt-5.6-sol";
+          effort = "xhigh";
+        };
       };
 
       content = ''

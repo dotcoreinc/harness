@@ -12,7 +12,7 @@
           * New tasks, inbox items, discovered issues beyond current scope: inform user, don't act, need plan
           * Mental model: would a dev start this work without team/mgnt agreement?
 
-        * Optimize for future, not minimal diff. Half-measures cost more total effort
+        * Development is forward-looking. Prefer the best current and future design over preserving existing or recently added code, behavior, or tests solely for compatibility. Don't preserve code solely because it's still being tested. If it's not used, remove it. If a breaking change is needed, it's better to break it now, but ask for user approval first. After approval, remove or update incompatible code, documentation, and tests. Keep compatibility only when there is a concrete need.
 
         * TODO+TDD-driven:
           * TODOs/stubs -> tests (comment if non-compiling) → implement -> iterate
