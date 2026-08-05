@@ -638,15 +638,15 @@ let
     {
       name = "raw agent references expose name description and reference";
       pass =
-        lib.hasInfix "Use target: Target agent description; (See agent: custom-agent)."
+        lib.hasInfix "Use target: Target agent description; `custom-agent` agent."
           agentReferenceScope.commands."uses-agents".embed
-        && agentReferenceScope.agents.target.reference == "(See agent: target)";
+        && agentReferenceScope.agents.target.reference == "`target` agent";
       detail = "expected source functions to reference raw agent metadata";
     }
     {
       name = "raw agent references support scoped agents";
       pass =
-        lib.hasInfix "Use Scoped agent description; (See agent: scoped)."
+        lib.hasInfix "Use Scoped agent description; `scoped` agent."
           scopedAgentReferenceScope.commands."uses-scoped-agent".embed
         && lib.hasInfix "Scoped agent uses (See: Pre Flight)." scopedAgentReferenceScope.agents.scoped.embed;
       detail = "expected raw metadata extraction to preserve function-valued agent declarations";

@@ -4,8 +4,13 @@ let
   frontmatter = import ./frontmatter.nix;
 
   # mkReference :: string -> string -> string
-  #   Formats a natural reference to an invocable instruction artifact.
+  #   Formats a leading-article reference to an invocable instruction artifact.
   mkReference = kind: name: "the `${name}` ${kind}";
+
+  # mkAgentReference :: string -> string
+  #   Formats an agent reference that flows mid-sentence, without a leading
+  #   article so it composes with surrounding prose (for example "a `X` agent").
+  mkAgentReference = name: "`${name}` agent";
 
   # mkInstructions :: { heading, content, outputPath?, harnesses?, ... }
   #   Authored instruction files (CLAUDE.md, AGENTS.md, rule files).
@@ -89,7 +94,7 @@ let
     in
     {
       embed = "${frontmatter}\n${args.content}";
-      reference = "(See agent: ${args.name})";
+      reference = mkAgentReference args.name;
     };
 
   # mkSkill :: { harness, name, description, content, kind?, outputPath?, model?, harnesses?,
@@ -369,6 +374,7 @@ let
       mkSkillFile
       mkCommand
       mkReference
+      mkAgentReference
       forHarness
       forSetting
       renderFrontmatter

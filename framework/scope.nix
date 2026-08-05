@@ -6,6 +6,7 @@
   mkSkillFile,
   mkCommand,
   mkReference,
+  mkAgentReference,
   forHarness,
   forSetting,
   renderFrontmatter,
@@ -451,7 +452,7 @@ let
       in
       {
         inherit name description;
-        reference = "(See agent: ${name})";
+        reference = mkAgentReference name;
       }
     ) rawAgents;
 

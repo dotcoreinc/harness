@@ -13,7 +13,7 @@
 
       2. For each feedback/comment, launch a ${
         scope.agents."junior-dev".reference
-      } sub-agent in background to explore/investigate the feedback.
+      } in background to explore/investigate the feedback.
          Collect the results into questions/investigations section. 
          If directly actionable without further planning, add to tasks section.
          If planning is required, note it and tell user about it. 
