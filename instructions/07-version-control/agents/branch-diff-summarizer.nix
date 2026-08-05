@@ -2,7 +2,7 @@
   nixantic.sources.review-workflow.agents."branch-diff-summarizer" =
     { scope }:
     {
-      description = "Analyzes branch diffs file by file";
+      description = "Analyzes branch diffs file by file. Not to be used for reviewing, but for summarizing changes in a technical way.";
 
       model = {
         claude = "haiku";

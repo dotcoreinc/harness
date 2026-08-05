@@ -7,6 +7,7 @@
           1. Prepare a dedicated `jj` review change named `private: agent: review - <topic>` using the repository version-control rule
              - Keep reviewer follow-up isolated from unrelated edits
         '';
+
         git = ''
           1. Prepare an isolated Git review checkpoint using the repository version-control rule
              - Start from a clean or review-only working tree before launching reviewers

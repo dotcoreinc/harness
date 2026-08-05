@@ -15,7 +15,7 @@
         * ${scope.blocks."project-doc-recall".preFlightRecall}
       '';
 
-      reference = "**STOP**: Before proceeding with any instructions above, you NEED to follow <pre-flight> instructions.";
+      reference = "**STOP**: Before proceeding with any instructions above, you NEED to follow <pre-flight> instructions. Task management, sub-agents and project docs are critical to the success of the execution.";
       injectReferenceIntoCommands = true;
     };
 }
