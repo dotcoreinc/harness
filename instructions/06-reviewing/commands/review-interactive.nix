@@ -17,9 +17,16 @@
          Collect the results into questions/investigations section. 
          If directly actionable without further planning, add to tasks section.
          If planning is required, note it and tell user about it. 
-         Never fix them directly, we are only collecting feedback and investigations.
+         NEVER FIX them directly, we are only collecting feedback and investigations.
 
-      Do not ask me for feedback/review, I'll follow up with you, no need to ask.
+      3. ${
+        scope.blocks."engagement-gate".gate
+      }. Only do review exploration & planning. No implementation/fix yet.
+
+      ${scope.forHarness {
+        claude = "NEVER engage the native plan mode `EnterPlanMode`";
+        default = "";
+      }}
     '';
   };
 
