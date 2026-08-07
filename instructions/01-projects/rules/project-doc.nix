@@ -2,9 +2,9 @@
   nixantic.sources.projects.blocks."project-doc-recall" =
     { scope }:
     {
-      preFlightRecall = "ALWAYS use project & phase docs to plan and track work as per project doc rules. When writing project/phase docs, use ${
+      preFlightRecall = "ALWAYS use project & phase docs to plan and track work as per project doc rules, using ${
         scope.skills."proj-writing".reference
-      }. Don't load it until you need to create or update them.";
+      } for instructions on how to write to them.";
       content = "";
     };
 

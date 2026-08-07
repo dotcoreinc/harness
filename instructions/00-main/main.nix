@@ -13,18 +13,15 @@
       heading = "Main instructions";
 
       content = ''
-        ## Top level
-        CRITICAL: When encounter file reference (ex: @rules/general.md), if not already loaded, read it.
+        ## Main instructions
 
-        IMPORTANT: Always write prose using ASD-STE100 Simplified Technical English standard. Short sentences, simple/short/common words, single synonym, active voice, verb as action, one instruction per sentence, no semicolons/emdash, etc.
+        CRITICAL: When encounter file reference (ex: @rules/general.md), if not already loaded, read it right away.
+
+        When talking to me, be brief, clear and direct. Talk as if you were talking to a junior. Always keep your answers short, but clear, without using uncessary complexity and long prose explanation. Prefer bullet points lists to prose/dense format. Prefer repeating words instead of using synonyms.
 
         Main agents ask the user with `AskUserQuestion`. Sub-agents follow their agent instructions or return questions and decisions to the parent. Never ask directly in responses. Include enough context.
 
-        Unless asked otherwise, always use 
-
         Trust explicit user input. Don't reconfirm clearly stated information or decisions. Ask only when something is missing, ambiguous, conflicting, or requires separate approval.
-
-        ${scope.blocks."engagement-gate".content}
 
         Planning is mandatory for ALL implementations, no matter how trivial. When agreed on a plan, ALWAYS follow it. If you deviate or the plan fails, stop and ask the user.
 
@@ -36,9 +33,9 @@
 
         If work fails after 5 attempts, STOP and ask user for instructions
 
-        ${scope.blocks."task-management".embed}
-
         ${scope.blocks."pre-flight".embed}
+
+        ${scope.blocks."engagement-gate".content}
 
         ${scope.blocks."context-understanding".embed}
 

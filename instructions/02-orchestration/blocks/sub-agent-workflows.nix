@@ -26,6 +26,15 @@
   #   - Implementation and decisions: Options, risks, evidence, and recommendations; no execution decisions or ownership.
   #   - Diagnosis: Debugging direction and strategic diagnosis.
   #   - Risk and ownership: Explicit-user-invoked and advisory-only; parent determines execution.
+  nixantic.sources.orchestration.instructions."rules/orchestration" =
+    { scope }:
+    {
+      heading = "Sub-agents workflows";
+      content = ''
+        ${scope.blocks."sub-agents-workflows".embed}
+      '';
+    };
+
   nixantic.sources.orchestration.blocks."sub-agent-selection" =
     { scope }:
     {
@@ -49,8 +58,7 @@
         Rules for managing our context and maximizing sub-agents delegation to preserve it.
       '';
 
-      preFlightRecall = "Your context precious, use <sub-agents-workflows> instructions. Always
-      prefer deletion to preserve context.";
+      preFlightRecall = "Your context precious, use <sub-agents-workflows> instructions.";
 
       tag = "sub-agents-workflows";
       taggedContent = ''
