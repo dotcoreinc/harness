@@ -62,7 +62,10 @@
 
       tag = "sub-agents-workflows";
       taggedContent = ''
-        * Main agent: Used primarily for high-level orchestration, project management, version control. Main agent context window is VERY precious; Anything requiring reading, understanding and exploring code should be delegated to sub-agents.
+        * Main agent: 
+          * Used primarily for high-level orchestration, project management, version control, decision orchestrator. 
+          * Main agent context window is VERY precious; Anything requiring exploring/reading code should be delegated to sub-agents. 
+          * It is CRITICAL for the main agent to understand the project, key decisions, design, architecture, etc. to properly orchestrate sub-agents.
 
         ${scope.blocks."sub-agent-selection".embed}
 
@@ -90,21 +93,23 @@
             * State the workspace directory and that they are a sub-agent.
             * Do not pre-chew investigation or judgment for sub-agents that can do it themselves.
 
-          * Sub-sub-agents:
-            * Use specialist review/exploration agents only for work within the delegating dev agent's stated task and decision limits.
-            * Return work exceeding those limits to the parent instead of delegating it to another dev agent.
-            * Delegate lower-tier work only when separable, deterministic, independently verifiable, and worth the handoff.
-            * Never delegate to the same tier.
-
           * Sub-agent output: ask to optimize output; enough info for clear understanding and proof of correct work; resume if not enough.
 
           * Resuming: If a sub-agent's delegated work is incomplete, its output needs clarification, or a follow-up directly continues that work, resume it with targeted instructions.
 
           * Reuse: Reuse sub-agents only within the same user request; use new sub-agents for each subsequent request, even when related to previous work.
 
-          * Trust work: If it reports having run commands (e.g. "ran tests → 493 passing"), trust it. Critically review design/choices/quality at a high level. If not enough: resume. Don't re-analyze work that a sub-agent did. if it's not enough, ask it to do more. you shouldn't start reading files that a sub-agent worked on to make your own idea, it's the sub-agent's job
+          * Trust work: If it reports having run commands (e.g. "ran tests → 493 passing"), trust it. Critically review design/choices/quality at a high level. If not enough: resume. Don't re-analyze work that a sub-agent did. if it's not enough, ask it to do more. yYu shouldn't start reading files that a sub-agent worked on to make your own idea, it's the sub-agent's job. But it's critical to understand key decisions, and can be done by asking for more info from sub-agents.
 
           * Project files: always reference relevant project files rather than copying their contents into sub-agent prompts. Project and phase documentation remain main-agent-owned. Other documentation may be delegated according to agent descriptions.
       '';
+
+      /*
+          * Sub-sub-agents:
+            * Use specialist review/exploration agents only for work within the delegating dev agent's stated task and decision limits.
+            * Return work exceeding those limits to the parent instead of delegating it to another dev agent.
+            * Delegate lower-tier work only when separable, deterministic, independently verifiable, and worth the handoff.
+            * Never delegate to the same tier.
+      */
     };
 }
