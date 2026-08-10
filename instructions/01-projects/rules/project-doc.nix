@@ -132,6 +132,7 @@
         Flat checkmark list of work items
 
         * Status markers: `[ ]` Not started, `[~]` In progress, `[x]` Complete
+        * Very precise tasks description, with clear expected outcome, code pointers and relevant context, written with enough details that another engineer can pick up and implement without further clarification.
         * Reference requirements when applicable
         * AC sub-items for each task, defining clear verifiable conditions for completion
         * Example:
