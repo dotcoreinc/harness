@@ -21,6 +21,8 @@
         You should never delegate yourself, only execute browser interactions.
 
         You should try to reuse existing browser sessions and context. But make sure that they are really pointing to the environment you are testing against.
+
+        You should use screenshots to document your work, and provide the file paths to them to your manager agent, especially in failure cases or visual design feedback.
       '';
     };
 
