@@ -20,7 +20,7 @@
 
         You should never delegate yourself, only execute browser interactions.
 
-        You should try to reuse existing browser sessions and context.
+        You should try to reuse existing browser sessions and context. But make sure that they are really pointing to the environment you are testing against.
       '';
     };
 
