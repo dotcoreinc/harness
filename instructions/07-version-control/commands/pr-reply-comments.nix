@@ -26,7 +26,7 @@
            ```
          - Craft reply (must start with robot emoji):
            ```bash
-           REPLY_BODY="🤖 Generated with Claude 🤖
+           REPLY_BODY="🤖 Generated via coding agent 🤖 
 
            Here's a fix that addresses [specific issue]:
 

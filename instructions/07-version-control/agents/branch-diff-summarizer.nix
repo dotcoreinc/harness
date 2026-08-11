@@ -1,5 +1,5 @@
 {
-  nixantic.sources.review-workflow.agents."branch-diff-summarizer" =
+  nixantic.sources.version-control.agents."branch-diff-summarizer" =
     { scope }:
     {
       description = "Analyzes branch diffs file by file. Not to be used for reviewing, but for summarizing changes in a technical way.";

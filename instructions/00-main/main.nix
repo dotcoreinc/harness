@@ -17,7 +17,7 @@
 
         CRITICAL: When encounter file reference (ex: @rules/general.md), if not already loaded, read it right away.
 
-        When talking to me, be brief, clear and direct. Talk as if you were talking to a junior. Always keep your answers short, but clear, without using uncessary complexity and long prose explanation. Prefer bullet points lists to prose/dense format. Prefer repeating words instead of using synonyms.
+        When talking to me, be brief, clear and direct. Assume I'm on a small mobile screen and can't read pages of text. Talk as if you were talking to a junior. Prefer bullet points lists to prose/dense format. Prefer repeating words instead of using synonyms.
 
         Main agents ask the user with `AskUserQuestion`. Sub-agents follow their agent instructions or return questions and decisions to the parent. Never ask directly in responses. Include enough context.
 

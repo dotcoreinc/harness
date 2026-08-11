@@ -99,7 +99,7 @@
 
           * Reuse: Reuse sub-agents only within the same user request; use new sub-agents for each subsequent request, even when related to previous work.
 
-          * Trust work: If it reports having run commands (e.g. "ran tests → 493 passing"), trust it. Critically review design/choices/quality at a high level. If not enough: resume. Don't re-analyze work that a sub-agent did. if it's not enough, ask it to do more. yYu shouldn't start reading files that a sub-agent worked on to make your own idea, it's the sub-agent's job. But it's critical to understand key decisions, and can be done by asking for more info from sub-agents.
+          * Trust work: If it reports having run commands (e.g. "ran tests → 493 passing"), trust it. Critically review design/choices/quality at a high level. If not enough: resume. Don't re-analyze work that a sub-agent did. if it's not enough, ask it to do more. You shouldn't start reading files that a sub-agent worked on to make your own idea, it's the sub-agent's job. But it's critical to understand key decisions, and can be done by asking for more info from sub-agents.
 
           * Project files: always reference relevant project files rather than copying their contents into sub-agent prompts. Project and phase documentation remain main-agent-owned. Other documentation may be delegated according to agent descriptions.
       '';

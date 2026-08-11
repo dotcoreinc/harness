@@ -15,7 +15,7 @@
 
           - Main instruction files (CLAUDE.md, AGENTS.md, rules/*, etc.): automatically loaded by agentic harnesses, at start or directory based. Expect in opencode config, should always be CLAUDE.md to make sure all harnesses load them.
           - Commands: invoked by user. Claude can also invoke them.
-          - Skills: loaded by LLMs based on user instructions or when think that they could be useful for their task. In Claude, skills=commands. Opencode, skills are dictincts.
+          - Skills: loaded by LLMs based on user instructions or when think that they could be useful for their task. In Claude, skills=commands. Opencode, skills are distinct.
           - Agents: instructions for sub-agents that can be spawned by harnesses. In opencode, can also describe instructions for main agents.
           - Blocks: own nixantic construct. Allow reusable instruction snippets and references. Can be embedded, but also referenced. Can be rendered as XML blocks, and then referred to with those (see tag)
 
@@ -28,7 +28,7 @@
           - Instruction sources are `.nix` files, typically under **~/dotfiles/**.
           - If you cannot locate them, **ask the user** where their instruction source files are.
           - Folders are an organization feature, not directly reflected in rendered output. Nix files define fragments.
-          - Commands/skills or sub-directory instruction files should not needlessy repeat information in more global instruction files.
+          - Commands/skills or sub-directory instruction files should not needlessly repeat information in more global instruction files.
 
           ## Instructions principles
 
@@ -39,7 +39,7 @@
           - When editing instructions: preserve local syntax/style, change only requested wording; no surrounding fluency rewrites.
           - One authoritative location per policy; reference/embed elsewhere. Do reconnaissance first, propose or use reusable blocks.
           - Checklists should be block rendered as xml tag for higher recall salience.
-          - Empty lines are automatically removed by renderer, so you can use them for readability in source files. Avoid multi-lines wrapping as they consume uncessary tokens on indented lines.
+          - Empty lines are automatically removed by renderer, so you can use them for readability in source files. Avoid multi-lines wrapping as they consume unnecessary tokens on indented lines.
           - When writing procedures with step by steps, push LLM to use ${
             scope.blocks."task-management".reference
           } methodology.

@@ -13,9 +13,8 @@
       2. Fix root cause, not symptom. Generic solution over specific case and bespoke fixes
       3. Ask user before destructive changes
       4. Test bugs: verify new test catches issue or update existing test to catch it
-      5. Document investigation: capture uncertainty, what was tried, what was learned in phase doc
-         Questions & Investigations Use a SR&ED documentation style to capture learnings and prevent going
-         in circles
+      5. Document investigation: capture uncertainty, hypothesis, attempts and learnings in phase doc.
+         Use a SR&ED documentation style to capture learnings and prevent going in circles.
     '';
   };
 }

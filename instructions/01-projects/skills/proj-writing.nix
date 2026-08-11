@@ -30,7 +30,7 @@
           ## Overall writing rules
           - Clear, concise, informative.
           - Append/amend only, don't rewrite history.
-          - Should follow a SR&ED style, showing uncertainties, hyptheses, experiments, decisions, outcomes, etc.
+          - Should follow a SR&ED style, showing uncertainties, hypotheses, experiments, decisions, outcomes, etc.
           - Respect section ordering rules.
 
           ## Project doc writing rules

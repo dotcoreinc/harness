@@ -28,7 +28,7 @@
         3. 🔳 Find or create project files
            - If no committed project files, confirm with user that a new project should be created and a suggestion of name based on goal or branch name. On confirmation, create project symlink, initial project doc structure following project files rules.
            - If committed project files exist, check if goal aligned with project and can be added as phase. Otherwise, confirm with user and propose new project to be created.
-           - If commited project files exist and goal is aligned, confirm phase name with user.
+           - If committed project files exist and goal is aligned, confirm phase name with user.
            - If new project, follow version control rules for symlink commit & doc commits.
 
         4. 🔳 Research, clarify and plan
