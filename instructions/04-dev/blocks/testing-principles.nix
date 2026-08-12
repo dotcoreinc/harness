@@ -19,7 +19,7 @@
 
         * Failures: when test fails, use ${scope.blocks.problem-solving.reference} to investigate root cause. Don't modify test to make it pass, unless it's genuinely wrong.
 
-        * Browser testing: any modifications to web applications should be tested with browser agent.
+        * Browser testing: any modifications to web applications should be tested in browser.
 
         * Infra / environment testing: prioritize external harness to test.
 
