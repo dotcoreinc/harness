@@ -4,6 +4,14 @@
     { scope }:
     {
       description = "Mid-level developer for well-scoped work within settled requirements and architecture: established-pattern implementation, test iteration, and reproducible diagnosis.";
+      permission = {
+        opencode = {
+          task = "deny";
+        };
+        claude = {
+          disallowedTools = [ "Agent" ];
+        };
+      };
 
       model = {
         claude = "sonnet";

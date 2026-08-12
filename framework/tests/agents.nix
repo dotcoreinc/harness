@@ -15,6 +15,14 @@ let
         effort = "xhigh";
       };
     };
+    permission = {
+      claude = {
+        disallowedTools = [ "Agent" ];
+      };
+      opencode = {
+        task = "deny";
+      };
+    };
   };
 
   renderAgent =
@@ -32,6 +40,7 @@ let
     "name: \"tiered-agent\""
     "description: \"Agent with harness-specific model and effort\""
     "model: \"sonnet\""
+    "disallowedTools: [\"Agent\"]"
     "---"
     ""
     "Agent body"
@@ -43,6 +52,8 @@ let
     "description: \"Agent with harness-specific model and effort\""
     "model: \"openai/gpt-5.6-luna\""
     "reasoningEffort: \"xhigh\""
+    "permission:"
+    "  task: \"deny\""
     "---"
     ""
     "Agent body"
@@ -50,9 +61,9 @@ let
 
   cases = [
     {
-      name = "Claude agent selects its model from string and omits OpenCode-only effort";
+      name = "Claude agent selects its model from string, omits OpenCode-only effort, and renders disallowedTools permission";
       pass = claudeAgent == claudeExpected;
-      detail = "expected Claude sonnet model with no effort field";
+      detail = "expected Claude sonnet model with no effort field and disallowedTools: [\"Agent\"]";
     }
     {
       name = "OpenCode agent selects its model and effort from nested attrset";

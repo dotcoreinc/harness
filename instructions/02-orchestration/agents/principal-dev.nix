@@ -4,6 +4,14 @@
     { scope }:
     {
       description = "Explicit-user-invoked, advisory-only principal engineer for architecture, strategy, design review, or debugging direction; never implements or owns delivery.";
+      permission = {
+        opencode = {
+          task = "deny";
+        };
+        claude = {
+          disallowedTools = [ "Agent" ];
+        };
+      };
 
       model = {
         claude = "fable";

@@ -4,6 +4,14 @@
     { scope }:
     {
       description = "Staff developer for cross-system architecture/implementation, systemic diagnosis, or critical/high-blast-radius technical decisions within supplied product direction.";
+      permission = {
+        opencode = {
+          task = "deny";
+        };
+        claude = {
+          disallowedTools = [ "Agent" ];
+        };
+      };
 
       model = {
         claude = "opus";
