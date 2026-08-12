@@ -16,7 +16,6 @@
            - If 10/10 understanding, stop and report
 
         2. 🔳 Research context
-           - Use ${scope.blocks.deep-thinking.reference}
            - Use ${scope.blocks.sub-agents-workflows.reference} for exploration, research and investigation
            - Search web for unfamiliar or potential outdated info
            - Add sub-task 🔳 to prevent forgetting uncertainties, work them out until full understanding

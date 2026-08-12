@@ -17,15 +17,11 @@
 
         ## Instructions
 
-        ${scope.blocks."deep-thinking".embed}
-
         1. If context empty or unclear, use `AskUserQuestion` to clarify
 
         2. 🔳 Research and understand
-           * Apply <deep-thinking> procedure
-           * Use sub-agents to explore codebase, read files, do research
-           * What is really being asked? What would success look like?
            * Map full scope: files involved, related files, cross-file concepts
+           * Explore, research, web search, etc.
 
         3. 🔳 Analyze and evaluate
            * Question assumptions: what haven't you verified? Simplest explanation?

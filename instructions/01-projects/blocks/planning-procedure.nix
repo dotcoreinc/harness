@@ -3,8 +3,8 @@
     { scope }:
     {
       content = ''
-        - Use ${scope.blocks.deep-thinking.reference}
         - Use ${scope.blocks.sub-agents-workflows.reference} for exploration, research and investigation
+
         - Use ${scope.blocks.context-understanding.reference} to improve understanding
 
         - Search web for unfamiliar or potential outdated info

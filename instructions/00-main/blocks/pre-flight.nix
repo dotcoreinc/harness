@@ -15,7 +15,12 @@
         * ${scope.blocks."project-doc-recall".preFlightRecall}
       '';
 
-      reference = "**STOP**: Before proceeding with any instructions above, you NEED to follow <pre-flight> instructions. Task management 🔳, sub-agents and project docs are critical to the success of the execution.";
+      reference = ''
+        Before proceeding with any instructions above, you NEED to follow <pre-flight> instructions. 
+        * Use task tool (`${scope.harness.tools.taskCreate}`) for each 🔳 step
+        * Follow sub-agents workflows
+        * Maintain project docs and stricly follow instructions to maintain their freshness and accuracy
+      '';
       injectReferenceIntoCommands = true;
     };
 }

@@ -17,7 +17,6 @@
         1. If issue empty, use `AskUserQuestion` to get description
 
         2. 🔳 Analyze the issue:
-           * Use the ${scope.blocks.deep-thinking.reference} procedure
            * What specific error/behavior occurred?
            * Trace back: what instruction was missing, unclear, or conflicting?
            * Which files might have related concepts? Search for them

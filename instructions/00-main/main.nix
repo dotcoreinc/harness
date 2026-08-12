@@ -40,8 +40,6 @@
         ${scope.blocks."context-understanding".embed}
 
         ${scope.blocks."problem-solving".embed}
-
-        ${scope.blocks."deep-thinking".embed}
       '';
     };
 }

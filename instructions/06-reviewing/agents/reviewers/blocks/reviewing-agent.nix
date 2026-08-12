@@ -55,7 +55,6 @@
            - For EACH check task:
              - Mark task in-progress
              - Examine changed hunks for this issue
-               - Apply `<deep-thinking>` procedure
                - Focus on changed code, not unrelated areas (unless blatant problem)
              - For EACH violation found, IMMEDIATELY insert a comment:
                `// REVIEW: [agent-name] - <description of issue, consequences, suggested fix>`

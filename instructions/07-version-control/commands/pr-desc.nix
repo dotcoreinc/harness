@@ -24,7 +24,6 @@
         1. 🔳 Analyze changes
            - Start from the changed-file list above
            - Read per-file diff, one by one
-           - Use the <deep-thinking> procedure
            - If user specified a focus area, prioritize those components
            - Code remain source of truth. You can check project docs, but may have drifted.
 
