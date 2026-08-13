@@ -43,7 +43,11 @@
              - Before marking task done: verify each AC sub-item passes
            - If deviating or overcomplicating, STOP and update user
            - If any decisions or discoveries, update project/phase doc
-           - Review agents can be used on uncertain steps, be very specific on which files @ commits/changes to review, but be critical and only fix critical issues and prevent overcomplication
+           - Review agents can be used on uncertain steps.
+             - They are expensive, they should be used mindfully. 
+             - Prefer 1-2 review towards then end, and prevent repeated back-and-forth. If that happens, stop, update user.
+             - Be very specific on which files @ commits/changes to review
+             - Be critical on their findings and focus on real issues. They may be overzealous; let's stick to our plan.
            - If an agent is stuck, review the evidence it returned. Resolve the blocker and resume it, or reselect using ${
              scope.blocks."sub-agent-selection".reference
            } when the task needs a different agent
