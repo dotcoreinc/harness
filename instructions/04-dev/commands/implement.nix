@@ -15,7 +15,8 @@
 
         # Instructions
 
-        1. 🔳 Verify 10/10 understanding.
+        1. 🔳 Verify 10/10 understanding, if not already done
+           - Skip if we just planned and understanding is already in context
            - Read ALL requirements in project doc
            - If unclear, ask user to use ${scope.commands."ctx-improve".reference}
            - Clarify if task contradicts or overlaps
