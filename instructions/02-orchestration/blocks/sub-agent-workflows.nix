@@ -1,7 +1,7 @@
 {
   # Dev-agent routing dimensions. Keep rendered descriptions below short and aligned with these boundaries.
   # - Junior
-  #   - Exploration: Primary agent for code exploration and factual lookup.
+  #   - Exploration: Main agent for code exploration and factual lookup.
   #   - Implementation and decisions: Deterministic, low-risk mechanical details only; no behavior, scope, design, requirement, plan, or prose-meaning decisions.
   #   - Diagnosis: None.
   #   - Version control: Read-only inspection only; no write operations or conflict resolution.
@@ -43,6 +43,7 @@
       tag = "sub-agent-selection";
       taggedContent = ''
         * Agent selection: select the listed dev agent whose description fits the task. Do not substitute explore/general/plan agents.
+          * explore: Local code exploration, web search/explore, but not to be used for debugging / decision-making
           * junior-dev: ${scope.agents."junior-dev".description}
           * mid-dev: ${scope.agents."mid-dev".description}
           * senior-dev: ${scope.agents."senior-dev".description}
@@ -71,7 +72,7 @@
 
         * Sub-agents
           * Delegation threshold:
-            * Project document work
+            * Project document read/work
               * No matter the size, always main agent
             * Writing code
               * Orchestrator mode (no write access) -> delegate

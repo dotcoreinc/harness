@@ -3,7 +3,15 @@
   nixantic.sources.orchestration.agents."junior-dev" =
     { scope }:
     {
-      description = "Junior developer for code exploration, factual lookup, deterministic low-risk mechanical changes; no version-control writes, conflict resolution, diagnosis, or independent technical or prose judgment.";
+      description = "Junior developer for deterministic low-risk mechanical changes; no version-control writes, conflict resolution, diagnosis, or independent technical or prose judgment.";
+      permission = {
+        opencode = {
+          task = "deny";
+        };
+        claude = {
+          disallowedTools = [ "Agent" ];
+        };
+      };
 
       model = {
         claude = "haiku";

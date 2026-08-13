@@ -18,6 +18,7 @@
          If directly actionable without further planning, add to tasks section.
          If planning is required, note it and tell user about it. 
          NEVER FIX them directly, we are only collecting feedback and investigations.
+         Collect all your questions for when I'll trigger a planning workflow. Don't ask them as we go.
 
       3. ${
         scope.blocks."engagement-gate".gate
