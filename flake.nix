@@ -44,6 +44,24 @@
         nixantic = ./modules/flake-parts.nix;
       };
 
+      # Reproducible dev shell loaded via direnv (`use flake`). Mirrors the
+      # ccmon flake: a plain `mkShell` per system. `flake-parts` is an unused
+      # input here, so this is a plain output, not a flake-parts module.
+      devShells = forAllSystems (
+        system:
+        let
+          pkgs = import nixpkgs { inherit system; };
+        in
+        {
+          default = pkgs.mkShell {
+            packages = [
+              pkgs.just
+              pkgs.nixfmt
+            ];
+          };
+        }
+      );
+
       packages = forAllSystems (
         system:
         let
