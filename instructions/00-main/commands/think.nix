@@ -17,7 +17,7 @@
 
         ## Instructions
 
-        1. If context empty or unclear, use `AskUserQuestion` to clarify
+         1. If context empty or unclear, ${scope.harness.prose.questions.request} to clarify
 
         2. 🔳 Research and understand
            * Map full scope: files involved, related files, cross-file concepts

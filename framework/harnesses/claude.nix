@@ -1,172 +1,115 @@
-{ renderFrontmatter }:
+_:
 {
   name = "claude";
   outputDir = "claude";
 
   tools = {
     taskCreate = "TaskCreate";
+    askUserQuestion = "AskUserQuestion";
   };
+  prose.questions.request = "use `AskUserQuestion`";
 
-  # https://code.claude.com/docs/en/sub-agents#supported-frontmatter-fields
-  # Check `mkAgent` for available options
-  renderAgentFrontmatter =
-    {
-      name,
-      description,
-      model,
-      effort ? null,
-      permission ? null,
-      ...
-    }:
+  renderArtifact = artifact:
     let
-      permissionValue = if permission != null then permission else { };
+      permissionValue = if artifact.permission != null then artifact.permission else { };
+      common = {
+        outputPath =
+          if artifact.kind == "instruction" && artifact.role == "main" then
+            "CLAUDE.md"
+          else if artifact.kind == "instruction" && artifact.role == "rule" then
+            "rules/${artifact.key}.md"
+          else if artifact.kind == "instruction" then
+            "${artifact.key}.md"
+          else if artifact.kind == "agent" then
+            "agents/${artifact.name}.md"
+          else if artifact.kind == "command" then
+            "commands/${artifact.name}.md"
+          else if artifact.kind == "skill" then
+            "skills/${artifact.key}/SKILL.md"
+          else if artifact.kind == "skillFile" then
+            "skills/${artifact.skillKey}/${artifact.subPath}"
+          else
+            throw "Nixantic Claude renderer does not support artifact kind '${artifact.kind}'";
+      };
+      agent = {
+        frontmatter = {
+          name = artifact.name;
+          description = artifact.description;
+          model = artifact.model;
+          effort = artifact.effort;
+          tools = permissionValue.tools or null;
+          disallowedTools = permissionValue.disallowedTools or null;
+          permissionMode = permissionValue.permissionMode or null;
+        };
+        frontmatterOrder = [
+          "name"
+          "description"
+          "model"
+          "effort"
+          "tools"
+          "disallowedTools"
+          "permissionMode"
+        ];
+      };
+      command = {
+        frontmatter = {
+          name = artifact.name;
+          description = artifact.description;
+          "argument-hint" = artifact.argumentHint;
+          model = artifact.model;
+          effort = artifact.effort;
+          context = artifact.context;
+          agent = artifact.agent;
+          "allowed-tools" = artifact.allowedTools;
+        };
+        frontmatterOrder = [
+          "name"
+          "description"
+          "argument-hint"
+          "model"
+          "effort"
+          "context"
+          "agent"
+          "allowed-tools"
+        ];
+      };
+      skill = {
+        frontmatter = command.frontmatter // {
+          metadata = artifact.metadata;
+          when_to_use = artifact.whenToUse;
+          "disable-model-invocation" = artifact.disableModelInvocation;
+          "user-invocable" = artifact.userInvocable;
+        };
+        frontmatterOrder = [
+          "name"
+          "description"
+          "argument-hint"
+          "model"
+          "effort"
+          "context"
+          "agent"
+          "allowed-tools"
+          "when_to_use"
+          "disable-model-invocation"
+          "user-invocable"
+          "metadata"
+        ];
+      };
     in
-    renderFrontmatter [
-      {
-        label = "name";
-        value = name;
-      }
-      {
-        label = "description";
-        value = description;
-      }
-      {
-        label = "model";
-        value = model;
-      }
-      {
-        label = "effort";
-        value = effort;
-      }
-      {
-        label = "tools";
-        value = permissionValue.tools or null;
-      }
-      {
-        label = "disallowedTools";
-        value = permissionValue.disallowedTools or null;
-      }
-      {
-        label = "permissionMode";
-        value = permissionValue.permissionMode or null;
-      }
-    ];
-
-  # https://code.claude.com/docs/en/skills#frontmatter-reference
-  # Check `mkCommand` for available options
-  renderCommandFrontmatter =
-    {
-      name,
-      description,
-      argumentHint ? null,
-      model ? null,
-      effort ? null,
-      context ? null,
-      agent ? null,
-      allowedTools ? null,
-      ...
-    }:
-    renderFrontmatter [
-      {
-        label = "name";
-        value = name;
-      }
-      {
-        label = "description";
-        value = description;
-      }
-      {
-        label = "argument-hint";
-        value = argumentHint;
-      }
-      {
-        label = "model";
-        value = model;
-      }
-      {
-        label = "effort";
-        value = effort;
-      }
-      {
-        label = "context";
-        value = context;
-      }
-      {
-        label = "agent";
-        value = agent;
-      }
-      {
-        label = "allowed-tools";
-        value = allowedTools;
-      }
-    ];
-
-  # https://code.claude.com/docs/en/skills#frontmatter-reference
-  # Check `mkSkill` for available options
-  renderSkillFrontmatter =
-    {
-      name,
-      description,
-      argumentHint ? null,
-      model ? null,
-      effort ? null,
-      context ? null,
-      agent ? null,
-      allowedTools ? null,
-      whenToUse ? null,
-      disableModelInvocation ? null,
-      userInvocable ? null,
-      metadata ? null,
-      ...
-    }:
-    renderFrontmatter [
-      {
-        label = "name";
-        value = name;
-      }
-      {
-        label = "description";
-        value = description;
-      }
-      {
-        label = "argument-hint";
-        value = argumentHint;
-      }
-      {
-        label = "model";
-        value = model;
-      }
-      {
-        label = "effort";
-        value = effort;
-      }
-      {
-        label = "context";
-        value = context;
-      }
-      {
-        label = "agent";
-        value = agent;
-      }
-      {
-        label = "allowed-tools";
-        value = allowedTools;
-      }
-      {
-        label = "when_to_use";
-        value = whenToUse;
-      }
-      {
-        label = "disable-model-invocation";
-        value = disableModelInvocation;
-      }
-      {
-        label = "user-invocable";
-        value = userInvocable;
-      }
-      {
-        label = "metadata";
-        value = metadata;
-      }
-    ];
+    common
+    // (
+      if artifact.kind == "instruction" || artifact.kind == "skillFile" then
+        {
+          frontmatter = { };
+          frontmatterOrder = [ ];
+        }
+      else if artifact.kind == "agent" then
+        agent
+      else if artifact.kind == "command" then
+        command
+      else if artifact.kind == "skill" then
+        skill
+      else
+        throw "Nixantic Claude renderer does not support artifact kind '${artifact.kind}'"
+    );
 }

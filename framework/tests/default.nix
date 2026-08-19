@@ -11,6 +11,10 @@ let
       result = (import ./agents.nix { inherit pkgs lib; }).allPass;
     }
     {
+      name = "artifact-rendering";
+      result = (import ./artifact-rendering.nix { inherit pkgs lib; }).allPass;
+    }
+    {
       name = "dual-output";
       result = (import ./dual-output.nix { inherit pkgs lib; }).allPass;
     }
@@ -41,6 +45,22 @@ let
     {
       name = "settings";
       result = (import ./settings.nix { inherit pkgs lib; }).allPass;
+    }
+    {
+      name = "capabilities";
+      result = (import ./capabilities.nix { inherit pkgs lib; }).allPass;
+    }
+    {
+      name = "pi";
+      result = (import ./pi.nix { inherit pkgs lib; }).allPass;
+    }
+    {
+      name = "pi-corpus";
+      result = (import ./pi-corpus.nix { inherit pkgs lib; }).allPass;
+    }
+    {
+      name = "rule-output";
+      result = (import ./rule-output.nix { inherit pkgs lib; }).allPass;
     }
   ];
 

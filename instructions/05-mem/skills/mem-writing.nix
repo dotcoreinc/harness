@@ -13,18 +13,36 @@
 
           ## Instructions kinds
 
-          - Main instruction files (CLAUDE.md, AGENTS.md, rules/*, etc.): automatically loaded by agentic harnesses, at start or directory based. Expect in opencode config, should always be CLAUDE.md to make sure all harnesses load them.
-          - Commands: invoked by user. Claude can also invoke them.
-          - Skills: loaded by LLMs based on user instructions or when think that they could be useful for their task. In Claude, skills=commands. Opencode, skills are distinct.
-          - Agents: instructions for sub-agents that can be spawned by harnesses. In opencode, can also describe instructions for main agents.
+          ${scope.forHarness {
+            pi = "- Main instruction files: `AGENTS.md` is active context; aggregated rules belong in it.";
+            default = "- Main instruction files (CLAUDE.md, AGENTS.md, rules/*, etc.): automatically loaded by agentic harnesses, at start or directory based. Expect in opencode config, should always be CLAUDE.md to make sure all harnesses load them.";
+          }}
+          ${scope.forHarness {
+            pi = "- Prompts: user-invoked Markdown prompt templates under `prompts/`.";
+            default = "- Commands: invoked by user. Claude can also invoke them.";
+          }}
+          ${scope.forHarness {
+            pi = "- Skills: Agent Skills under `skills/<name>/SKILL.md`, loaded on demand from their descriptions.";
+            default = "- Skills: loaded by LLMs based on user instructions or when think that they could be useful for their task. In Claude, skills=commands. Opencode, skills are distinct.";
+          }}
+          ${scope.forHarness {
+            pi = "- Agents: adapter-defined files under `agents/`; consumers map them to configured Pi agent locations.";
+            default = "- Agents: instructions for sub-agents that can be spawned by harnesses. In opencode, can also describe instructions for main agents.";
+          }}
           - Blocks: own nixantic construct. Allow reusable instruction snippets and references. Can be embedded, but also referenced. Can be rendered as XML blocks, and then referred to with those (see tag)
 
           ## Instructions locations
 
-          Project/directory specific instructions: CLAUDE.md, AGENTS.md, .opencode/AGENTS.md
+          ${scope.forHarness {
+            pi = "Project/directory specific instructions: `AGENTS.md`; skill directories use `SKILL.md`.";
+            default = "Project/directory specific instructions: CLAUDE.md, AGENTS.md, .opencode/AGENTS.md";
+          }}
 
           User instructions / commands / agents:
-          - Don't try to edit ~/.claude or ~/.config/opencode directly, as they are rendered versions of instruction source files.
+          ${scope.forHarness {
+            pi = "- Do not edit rendered Pi artifacts directly; edit the Nix instruction source.";
+            default = "- Don't try to edit ~/.claude or ~/.config/opencode directly, as they are rendered versions of instruction source files.";
+          }}
           - Instruction sources are `.nix` files, typically under **~/dotfiles/**.
           - If you cannot locate them, **ask the user** where their instruction source files are.
           - Folders are an organization feature, not directly reflected in rendered output. Nix files define fragments.
@@ -51,7 +69,10 @@
           - You may not be able to edit them directly either if you're in a sandbox. If that's the case, tell the user and give a detailed description of changes that need to be done.
           - Load similar/surrounding instruction files for patterns.
           - Do reconnaissance, find edit locations and then propose edit plan to user.
-          - If you spent too much time finding information about nixantic or dotfiles setup, propose changes to dotfiles CLAUDE.md's.
+          ${scope.forHarness {
+            pi = "- If Nixantic or dotfiles setup takes too long to locate, propose improving the authoritative `AGENTS.md` guidance.";
+            default = "- If you spent too much time finding information about nixantic or dotfiles setup, propose changes to dotfiles CLAUDE.md's.";
+          }}
           - If user agrees, proceed with edits.
           - After edit: diff-review added prose, duplicated policy, unnecessary rewording, scope expansion; remove before finish.
           - Regenerate instructions after edits using repo's check&build commands.

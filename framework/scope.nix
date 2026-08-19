@@ -140,7 +140,7 @@ let
 
     agents = lib.mapAttrs (
       key: data:
-      self.scopeApi.mkAgent ({ harness = self.harness; } // data // { name = data.name or key; })
+      self.scopeApi.mkAgent ({ inherit key; harness = self.harness; } // data // { name = data.name or key; })
     ) (filterForHarness self self.rawAgents);
 
     commands = lib.mapAttrs (
@@ -151,8 +151,8 @@ let
       self.scopeApi.mkCommand (
         {
           harness = self.harness;
+          inherit key;
           kind = "flat";
-          outputPath = "commands/${data.name or key}.md";
         }
         // commandData
         // {
@@ -166,8 +166,8 @@ let
       self.scopeApi.mkSkill (
         {
           harness = self.harness;
+          inherit key;
           kind = "directory";
-          outputPath = "skills/${key}/SKILL.md";
         }
         // entry.main
         // {
@@ -187,17 +187,23 @@ let
               processed =
                 if subData.kind == "nix" then
                   self.scopeApi.mkSkillFile {
+                    inherit (self) harness;
+                    key = fullPath;
+                    skillKey = skillKey;
+                    subPath = subPath;
                     content =
                       applySource self (mkRawAgentMetadata self self.rawAgents)
                         (mkRawCommandMetadata self self.rawCommands)
                         (mkRawSkillMetadata self.rawSkills self.rawCommands)
                         subData.content;
-                    outputPath = fullPath;
                   }
                 else
-                  {
-                    embed = subData.content;
-                    outputPath = fullPath;
+                  self.scopeApi.mkSkillFile {
+                    inherit (self) harness;
+                    key = fullPath;
+                    skillKey = skillKey;
+                    subPath = subPath;
+                    content = subData.content;
                   };
             in
             {
@@ -235,8 +241,8 @@ let
                 value = self.scopeApi.mkSkill (
                   {
                     harness = self.harness;
+                    key = skillName;
                     kind = "directory";
-                    outputPath = "skills/${skillName}/SKILL.md";
                   }
                   // commandData
                   // {
@@ -266,8 +272,8 @@ let
                 value = self.scopeApi.mkSkill (
                   {
                     harness = self.harness;
+                    key = cmdName;
                     kind = "flat";
-                    outputPath = "commands/${cmdName}.md";
                   }
                   // commandData
                   // {
@@ -300,9 +306,7 @@ let
   #   authoredInstructions → agentInstructions → commandInstructions →
   #   extraCommandsFromSkills → skillMainInstructions → extraSkillsFromCommands
   addInstructions = self: {
-    authoredInstructions = lib.mapAttrs (_: data: self.scopeApi.mkInstructions data) (
-      filterForHarness self self.rawAuthoredInstructions
-    );
+    authoredInstructions = renderAuthoredInstructions self (filterForHarness self self.rawAuthoredInstructions);
 
     agentInstructions = lib.mapAttrs' (
       name: agent: lib.nameValuePair "agents/${name}" agent
@@ -349,6 +353,42 @@ let
       // self.skillMainInstructions
       // self.extraSkillsFromCommands;
   };
+
+  # renderAuthoredInstructions :: scope -> attrs -> attrs
+  #   Produces standalone instruction artifacts or folds the active rule bodies
+  #   into the single declared main instruction for aggregation-capable harnesses.
+  renderAuthoredInstructions =
+    self: declarations:
+    let
+      output = self.settings.harnesses.${self.harness.name}.rules.output or "files";
+      activeRules = lib.filterAttrs (_: data: (data.role or "regular") == "rule") declarations;
+      mainKeys = builtins.attrNames (lib.filterAttrs (_: data: (data.role or "regular") == "main") declarations);
+      ruleKeys = builtins.attrNames activeRules;
+      mergedDeclarations =
+        if output == "files" then
+          declarations
+        else if output == "merge-main" then
+          if ruleKeys == [ ] then
+            lib.filterAttrs (_: data: (data.role or "regular") != "rule") declarations
+          else if builtins.length mainKeys != 1 then
+            throw "Nixantic rules.output = merge-main requires exactly one active main instruction when active rules exist"
+          else
+            let
+              mainKey = builtins.head mainKeys;
+              mergedMain = declarations.${mainKey} // {
+                content = "${declarations.${mainKey}.content}\n\n${builtins.concatStringsSep "\n\n" (
+                  map (key: activeRules.${key}.content) ruleKeys
+                )}";
+              };
+            in
+            (lib.filterAttrs (_: data: (data.role or "regular") != "rule") declarations)
+            // { ${mainKey} = mergedMain; }
+        else
+          throw "Nixantic rules.output must be \"files\" or \"merge-main\", got \"${output}\"";
+    in
+    lib.mapAttrs (
+      key: data: self.scopeApi.mkInstructions ({ inherit key; harness = self.harness; } // data)
+    ) mergedDeclarations;
 
   # ── Helpers ────────────────────────────────────────────────────────────────
 

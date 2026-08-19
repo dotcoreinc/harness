@@ -25,7 +25,7 @@
            - Create normal `00-<project>.md` and `01-<phase>.md` files in the directory reported by `agentic-proj-docs`.
 
         3. 🔳 Ensure context loaded, goal clear, task defined
-           - Clarify via `AskUserQuestion` if empty or unclear.
+           - ${scope.harness.prose.questions.request} if empty or unclear.
 
         4. 🔳 Research, clarify and plan
            ${scope.blocks."plan-procedure".embed}

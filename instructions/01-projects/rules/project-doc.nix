@@ -8,9 +8,10 @@
       content = "";
     };
 
-  nixantic.sources.project-docs.instructions."rules/project-doc" =
+  nixantic.sources.project-docs.instructions."project-doc" =
     { scope }:
     rec {
+      role = "rule";
       heading = "Project Doc Structure";
 
       content = ''

@@ -64,17 +64,20 @@ let
       };
 
       instructions = {
-        "rules/feature-rule" =
+        "feature-rule" =
           { scope }:
           {
+            role = "rule";
             heading = scope.forHarness {
               claude = "Feature Rule (Claude)";
               opencode = "Feature Rule (OpenCode)";
+              pi = "Feature Rule (Pi)";
             };
             content = "Rule content with ${scope.blocks."feature-block".reference}.";
             outputPath = scope.forHarness {
               claude = "rules/feature-rule-claude.md";
               opencode = "rules/feature-rule-opencode.md";
+              pi = "rules/feature-rule-pi.md";
             };
           };
       };
@@ -407,14 +410,14 @@ let
     {
       name = "source-set instruction outputPath and forHarness";
       pass =
-        featureScope.instructions."rules/feature-rule".outputPath == "rules/feature-rule-claude.md"
+        featureScope.instructions."feature-rule".outputPath == "rules/feature-rule-claude.md"
         &&
-          featureOpencodeScope.instructions."rules/feature-rule".outputPath
+          featureOpencodeScope.instructions."feature-rule".outputPath
           == "rules/feature-rule-opencode.md"
-        && lib.hasInfix "Feature Rule (Claude)" featureScope.instructions."rules/feature-rule".embed
+        && lib.hasInfix "Feature Rule (Claude)" featureScope.instructions."feature-rule".embed
         &&
           lib.hasInfix "Feature Rule (OpenCode)"
-            featureOpencodeScope.instructions."rules/feature-rule".embed;
+            featureOpencodeScope.instructions."feature-rule".embed;
       detail = "expected source-set instruction to select harness-specific outputPath and heading via forHarness";
     }
 

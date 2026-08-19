@@ -1,5 +1,5 @@
 {
-  # nixantic.sources.harnesses.instructions."rules/browser" = {
+  # nixantic.sources.harnesses.instructions."browser" = {
   #   heading = "Web Browser";
   #   harnesses = [ "opencode" ];
   #   content = ''

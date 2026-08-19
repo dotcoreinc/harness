@@ -26,9 +26,10 @@
   #   - Implementation and decisions: Options, risks, evidence, and recommendations; no execution decisions or ownership.
   #   - Diagnosis: Debugging direction and strategic diagnosis.
   #   - Risk and ownership: Explicit-user-invoked and advisory-only; parent determines execution.
-  nixantic.sources.orchestration.instructions."rules/orchestration" =
+  nixantic.sources.orchestration.instructions."orchestration" =
     { scope }:
     {
+      role = "rule";
       heading = "Sub-agents workflows";
       content = ''
         ${scope.blocks."sub-agents-workflows".embed}

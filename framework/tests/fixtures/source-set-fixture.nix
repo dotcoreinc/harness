@@ -11,13 +11,11 @@
       main =
         { scope }:
         {
-          outputPath = scope.forHarness {
-            claude = "CLAUDE.md";
-            opencode = "AGENTS.md";
-          };
+          role = "main";
           heading = scope.forHarness {
             claude = "Claude";
             opencode = "OpenCode";
+            pi = "Pi";
           };
           content = ''
             # Fixture-Generated Instructions

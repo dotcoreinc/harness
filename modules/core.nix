@@ -10,6 +10,10 @@ let
   instructionCfg = cfg.instructions;
 
   sourceType = lib.types.lazyAttrsOf lib.types.raw;
+  rulesOutputType = lib.types.enum [
+    "files"
+    "merge-main"
+  ];
   kinds = [
     "blocks"
     "agents"
@@ -43,6 +47,7 @@ let
     sources = cfg.sources;
     settings = {
       versionControl = cfg.versionControl;
+      harnesses = instructionCfg.harnesses;
     };
   };
 
@@ -79,10 +84,25 @@ let
   corpusCheck = pkgs.runCommand "nixantic-builtin-corpus-check" { } ''
     test -f ${rendered.package}/claude/CLAUDE.md
     test -f ${rendered.package}/opencode/AGENTS.md
+    test -f ${rendered.package}/pi/AGENTS.md
     test -d ${rendered.package}/claude/commands
     test -d ${rendered.package}/opencode/commands
+    test -d ${rendered.package}/pi/prompts
+    test -d ${rendered.package}/pi/skills
     test -n "$(ls -A ${rendered.package}/claude/agents)"
     test -n "$(ls -A ${rendered.package}/opencode/agents)"
+    test -n "$(ls -A ${rendered.package}/pi/agents)"
+    test ! -e ${rendered.package}/pi/rules
+    grep -F 'questionnaire' ${rendered.package}/pi/prompts/ctx-plan.md
+    grep -F 'name: "proj-writing"' ${rendered.package}/pi/skills/proj-writing/SKILL.md
+    grep -F 'name: "architecture-reviewer"' ${rendered.package}/pi/agents/architecture-reviewer.md
+    grep -F '`questionnaire`' ${rendered.package}/pi/AGENTS.md
+    grep -F '`Agent`' ${rendered.package}/pi/AGENTS.md
+    ! grep -R -F 'AskUserQuestion' ${rendered.package}/pi
+    ! grep -R -F 'TaskOutput' ${rendered.package}/pi
+    ! grep -R -F 'using the `Skill` tool' ${rendered.package}/pi
+    ! grep -R -F 'forked context' ${rendered.package}/pi
+    ! grep -R -F '!`' ${rendered.package}/pi
     touch $out
   '';
 
@@ -142,6 +162,43 @@ in
         type = lib.types.lazyAttrsOf lib.types.raw;
         default = { };
         description = "BOM renderer overrides, including encoding metadata.";
+      };
+
+      harnesses = {
+        claude.rules.output = lib.mkOption {
+          type = rulesOutputType;
+          default = "files";
+          description = "How Claude Code rule instructions are emitted.";
+        };
+
+        opencode.rules.output = lib.mkOption {
+          type = rulesOutputType;
+          default = "files";
+          description = "How OpenCode rule instructions are emitted.";
+        };
+
+        pi = {
+          rules.output = lib.mkOption {
+            type = rulesOutputType;
+            default = "merge-main";
+            description = "How Pi rule instructions are emitted.";
+          };
+          agents = lib.mkOption {
+            type = lib.types.enum [ "tintinweb" ];
+            default = "tintinweb";
+            description = "Pi sub-agent file adapter expected by the rendered instructions.";
+          };
+          tasks = lib.mkOption {
+            type = lib.types.enum [ "tintinweb" ];
+            default = "tintinweb";
+            description = "Pi task capability adapter expected by the rendered instructions.";
+          };
+          questions = lib.mkOption {
+            type = lib.types.enum [ "pi-vault-questionnaire" ];
+            default = "pi-vault-questionnaire";
+            description = "Pi question capability adapter expected by the rendered instructions.";
+          };
+        };
       };
 
       rendered = lib.mkOption {

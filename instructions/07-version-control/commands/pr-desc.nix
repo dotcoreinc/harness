@@ -1,6 +1,9 @@
 {
   nixantic.sources.version-control.commands."pr-desc" =
     { scope }:
+    let
+      humanWriter = scope.skills."human-writer".name;
+    in
     {
       description = "Generate PR-ready summary of branch changes with per-component analysis and Summary + Implementation Notes";
       model = {
@@ -12,7 +15,10 @@
       context = "fork";
 
       content = ''
-        Goal: generate a detailed changelog-style summary of branch changes for reference. Uses project context and branch diff to create multi-level breakdown. Don't use sub-agents to do the work, since you're already a forked context.
+        Goal: generate a detailed changelog-style summary of branch changes for reference. Uses project context and branch diff to create multi-level breakdown. ${scope.forHarness {
+          pi = "Do not use sub-agents for this task; work in the current session.";
+          default = "Don't use sub-agents to do the work, since you're already a forked context.";
+        }}
 
         ## State
 
@@ -28,9 +34,10 @@
            - Code remain source of truth. You can check project docs, but may have drifted.
 
         2. 🔳 Generate report in one message, without any following messages:
-           - Load the `${
-             scope.skills."human-writer".name
-           }` skill using the `Skill` tool for tone (no AI filler, no superlatives)
+            - ${scope.forHarness {
+              pi = "Load the `${humanWriter}` Agent Skill guidance for tone (no AI filler, no superlatives).";
+              default = "Load the `${humanWriter}` skill using the `Skill` tool for tone (no AI filler, no superlatives)";
+            }}
            - Wrap identifiers (types, functions, files, fields) in backticks
 
            Emit two sections in order:

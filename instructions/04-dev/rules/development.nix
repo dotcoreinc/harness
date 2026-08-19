@@ -1,7 +1,8 @@
 {
-  nixantic.sources.development-workflow.instructions."rules/development" =
+  nixantic.sources.development-workflow.instructions."development" =
     { scope }:
     {
+      role = "rule";
       heading = "Development Instructions";
       content = ''
 

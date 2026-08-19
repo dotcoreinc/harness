@@ -45,13 +45,15 @@ let
       instructions.main =
         { scope }:
         {
+          role = "main";
           heading = "Project instructions";
           content = "Use the project conventions.";
-          outputPath = scope.forHarness {
-            claude = "CLAUDE.md";
-            opencode = "AGENTS.md";
-          };
         };
+      instructions.rule = {
+        role = "rule";
+        heading = "Project rule";
+        content = "Use the project rule.";
+      };
       commands.hello = {
         description = "Say hello";
         content = "Hello from a generated command.";
@@ -71,6 +73,46 @@ let
     sources = docsSources;
     settings.versionControl.mode = "jj";
   };
+  moduleHarnessSettings = {
+    claude.rules.output = "merge-main";
+    opencode.rules.output = "merge-main";
+    pi = {
+      rules.output = "files";
+      agents = "tintinweb";
+      tasks = "tintinweb";
+      questions = "pi-vault-questionnaire";
+    };
+  };
+  defaultHarnessSettings = {
+    claude.rules.output = "files";
+    opencode.rules.output = "files";
+    pi = {
+      rules.output = "merge-main";
+      agents = "tintinweb";
+      tasks = "tintinweb";
+      questions = "pi-vault-questionnaire";
+    };
+  };
+  moduleOverrideEval = evalCore [
+    {
+      nixantic.instructions.profile = "none";
+      nixantic.instructions.harnesses = moduleHarnessSettings;
+      nixantic.sources = docsSources;
+    }
+  ];
+  invalidModuleSettings = builtins.tryEval (
+    (evalCore [ { nixantic.instructions.harnesses.pi.tasks = "not-an-adapter"; } ]).config.nixantic.instructions.package
+  );
+  directOverrideRendered = import ../framework {
+    inherit pkgs lib;
+    postProcess = true;
+    sourceRoots = [ ];
+    sources = docsSources;
+    settings = {
+      versionControl.mode = "jj";
+      harnesses = moduleHarnessSettings;
+    };
+  };
   homeEval = evalHome [
     {
       nixantic.instructions.install.files = [
@@ -83,6 +125,26 @@ let
           harness = "opencode";
           source = "AGENTS.md";
           target = ".config/opencode/AGENTS.md";
+        }
+        {
+          harness = "pi";
+          source = "AGENTS.md";
+          target = ".pi/agent/AGENTS.md";
+        }
+        {
+          harness = "pi";
+          source = "prompts/hello.md";
+          target = ".pi/agent/prompts/hello.md";
+        }
+        {
+          harness = "pi";
+          source = "skills/example/SKILL.md";
+          target = ".pi/agent/skills/example/SKILL.md";
+        }
+        {
+          harness = "pi";
+          source = "agents/example.md";
+          target = ".pi/agent/agents/example.md";
         }
       ];
       nixantic.instructions.wrappers.install = true;
@@ -111,6 +173,7 @@ in
   core-module = pkgs.runCommand "nixantic-core-module-check" { } ''
     test -f ${coreEval.config.nixantic.instructions.package}/claude/CLAUDE.md
     test -f ${coreEval.config.nixantic.instructions.package}/opencode/AGENTS.md
+    test -f ${coreEval.config.nixantic.instructions.package}/pi/AGENTS.md
     test -x ${
       coreEval.config.nixantic.instructions.tools.packages."agentic-proj-docs"
     }/bin/agentic-proj-docs
@@ -120,6 +183,39 @@ in
     test -f ${coreEval.config.nixantic.instructions.package}/opencode/.gitignore
     test -f ${coreNoBuiltinEval.config.nixantic.instructions.package}/claude/BOM.md
     test ! -s ${coreEval.config.nixantic.instructions.package}/opencode/.gitignore
+    touch $out
+  '';
+
+  module-settings = pkgs.runCommand "nixantic-module-settings-check" { } ''
+    test '${builtins.toJSON coreEval.config.nixantic.instructions.harnesses}' = '${builtins.toJSON defaultHarnessSettings}'
+    test '${builtins.toJSON moduleOverrideEval.config.nixantic.instructions.harnesses}' = '${builtins.toJSON moduleHarnessSettings}'
+    test '${moduleOverrideEval.config.nixantic.instructions.package}' = '${directOverrideRendered.package}'
+    ${
+      if invalidModuleSettings.success then
+        "echo invalid Pi module adapter unexpectedly evaluated >&2; exit 1"
+      else
+        "true"
+    }
+    grep -F 'Use the project rule' ${moduleOverrideEval.config.nixantic.instructions.package}/claude/CLAUDE.md
+    grep -F 'Use the project rule' ${moduleOverrideEval.config.nixantic.instructions.package}/opencode/AGENTS.md
+    test ! -e ${moduleOverrideEval.config.nixantic.instructions.package}/claude/rules
+    test ! -e ${moduleOverrideEval.config.nixantic.instructions.package}/opencode/rules
+    test -f ${moduleOverrideEval.config.nixantic.instructions.package}/pi/rules/rule.md
+    touch $out
+  '';
+
+  builtin-pi-corpus = pkgs.runCommand "nixantic-builtin-pi-corpus-check" { } ''
+    test -f ${coreEval.config.nixantic.instructions.package}/pi/AGENTS.md
+    test -d ${coreEval.config.nixantic.instructions.package}/pi/prompts
+    test -d ${coreEval.config.nixantic.instructions.package}/pi/skills
+    test -n "$(ls -A ${coreEval.config.nixantic.instructions.package}/pi/agents)"
+    grep -F 'Main instructions' ${coreEval.config.nixantic.instructions.package}/pi/AGENTS.md
+    grep -F 'questionnaire' ${coreEval.config.nixantic.instructions.package}/pi/prompts/ctx-plan.md
+    grep -F 'name: "proj-writing"' ${coreEval.config.nixantic.instructions.package}/pi/skills/proj-writing/SKILL.md
+    grep -F 'name: "architecture-reviewer"' ${coreEval.config.nixantic.instructions.package}/pi/agents/architecture-reviewer.md
+    test ! -e ${coreEval.config.nixantic.instructions.package}/pi/rules
+    ! grep -R -F 'AskUserQuestion' ${coreEval.config.nixantic.instructions.package}/pi
+    ! grep -R -F 'TaskOutput' ${coreEval.config.nixantic.instructions.package}/pi/prompts/review-launch.md
     touch $out
   '';
 
@@ -152,6 +248,7 @@ in
   git-export-variants = pkgs.runCommand "nixantic-git-export-variants-check" { } ''
     test -f ${gitCoreEval.config.nixantic.instructions.package}/claude/CLAUDE.md
     test -f ${gitCoreEval.config.nixantic.instructions.package}/opencode/AGENTS.md
+    test -f ${gitCoreEval.config.nixantic.instructions.package}/pi/AGENTS.md
     assert_variant() {
       expected=$1
       unexpected=$2
@@ -166,10 +263,12 @@ in
     }
     assert_variant 'jj-current-branch' 'git branch --show-current' \
       ${coreEval.config.nixantic.instructions.package}/claude/rules/version-control.md \
-      ${coreEval.config.nixantic.instructions.package}/opencode/rules/version-control.md
+      ${coreEval.config.nixantic.instructions.package}/opencode/rules/version-control.md \
+      ${coreEval.config.nixantic.instructions.package}/pi/AGENTS.md
     assert_variant 'git branch --show-current' 'jj-current-branch' \
       ${gitCoreEval.config.nixantic.instructions.package}/claude/rules/version-control.md \
-      ${gitCoreEval.config.nixantic.instructions.package}/opencode/rules/version-control.md
+      ${gitCoreEval.config.nixantic.instructions.package}/opencode/rules/version-control.md \
+      ${gitCoreEval.config.nixantic.instructions.package}/pi/AGENTS.md
     grep -F '${gitCoreEval.config.nixantic.instructions.package}/claude' ${gitCoreEval.config.nixantic.instructions.wrappers.packages.claude}/bin/nixantic-claude
     grep -F '${gitCoreEval.config.nixantic.instructions.package}/opencode' ${gitCoreEval.config.nixantic.instructions.wrappers.packages.opencode}/bin/nixantic-opencode
     touch $out
@@ -179,6 +278,18 @@ in
     test ${
       lib.escapeShellArg homeEval.config.home.file.".claude/CLAUDE.md".source
     } = ${lib.escapeShellArg "${homeEval.config.nixantic.instructions.package}/claude/CLAUDE.md"}
+    test ${
+      lib.escapeShellArg homeEval.config.home.file.".pi/agent/AGENTS.md".source
+    } = ${lib.escapeShellArg "${homeEval.config.nixantic.instructions.package}/pi/AGENTS.md"}
+    test ${
+      lib.escapeShellArg homeEval.config.home.file.".pi/agent/prompts/hello.md".source
+    } = ${lib.escapeShellArg "${homeEval.config.nixantic.instructions.package}/pi/prompts/hello.md"}
+    test ${
+      lib.escapeShellArg homeEval.config.home.file.".pi/agent/skills/example/SKILL.md".source
+    } = ${lib.escapeShellArg "${homeEval.config.nixantic.instructions.package}/pi/skills/example/SKILL.md"}
+    test ${
+      lib.escapeShellArg homeEval.config.home.file.".pi/agent/agents/example.md".source
+    } = ${lib.escapeShellArg "${homeEval.config.nixantic.instructions.package}/pi/agents/example.md"}
     ${
       if
         builtins.elem coreEval.config.nixantic.instructions.tools.packages."agentic-proj-docs"
@@ -197,6 +308,13 @@ in
       else
         "echo 'Home Manager does not install agentic-proj-create-adhoc' >&2; exit 1"
     }
+    ${
+      if builtins.hasAttr "pi" homeEval.config.nixantic.instructions.wrappers.packages then
+        "echo Home Manager unexpectedly exposes a Pi wrapper >&2; exit 1"
+      else
+        "true"
+    }
+    test ${toString (builtins.length homeEval.config.home.packages)} = 4
     ${
       if duplicateHomeEval.success then
         "echo duplicate target unexpectedly evaluated >&2; exit 1"
@@ -332,6 +450,14 @@ in
     } = ${lib.escapeShellArg "${homeEval.config.nixantic.instructions.package}/claude/CLAUDE.md"}
     grep -F 'CLAUDE_CONFIG_DIR' ${coreEval.config.nixantic.instructions.wrappers.packages.claude}/bin/nixantic-claude
     grep -F 'OPENCODE_CONFIG_DIR' ${coreEval.config.nixantic.instructions.wrappers.packages.opencode}/bin/nixantic-opencode
+    grep -F 'harness = "pi"' ${../README.md}
+    grep -F 'rules.output' ${../README.md}
+    grep -F 'agents = "tintinweb"' ${../README.md}
+    grep -F 'tasks = "tintinweb"' ${../README.md}
+    grep -F 'questions = "pi-vault-questionnaire"' ${../README.md}
+    grep -F 'target = ".pi/agent/agents/reviewer.md"' ${../README.md}
+    grep -F '~/.pi/agent/agents/' ${../README.md}
+    grep -F 'Consumers install and activate Pi' ${../README.md}
     touch $out
   '';
 }

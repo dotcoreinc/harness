@@ -28,15 +28,13 @@
     instructions.main =
       { scope }:
       {
+        role = "main";
         heading = scope.forHarness {
           claude = "Rendered Package Claude";
           opencode = "Rendered Package OpenCode";
+          pi = "Rendered Package Pi";
         };
         content = "Main body.";
-        outputPath = scope.forHarness {
-          claude = "CLAUDE.md";
-          opencode = "AGENTS.md";
-        };
       };
   };
 }

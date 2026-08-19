@@ -83,6 +83,7 @@
         // {
           framework = core.check;
           builtin-corpus = core.corpusCheck;
+          pi-builtin-corpus = validation.builtin-pi-corpus;
           claude-wrapper = core.wrapperChecks.claude;
           opencode-wrapper = core.wrapperChecks.opencode;
           git-builtin-corpus = gitCore.corpusCheck;

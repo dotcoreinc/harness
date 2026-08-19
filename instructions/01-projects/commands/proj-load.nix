@@ -29,7 +29,7 @@
 
         2. 🔳 Read current/next phase docs mentioned in checkpoint/next steps
               Mindful of context window: don't read irrelevant old/future docs, but read relevant phase docs fully
-              On ambiguity about next steps, `AskUserQuestion` to clarify next focus
+              On ambiguity about next steps, ${scope.harness.prose.questions.request} to clarify next focus
 
         3. 🔳 Synthesize context & summarize current state
       '';

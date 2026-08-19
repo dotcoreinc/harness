@@ -16,7 +16,7 @@
         1. 🔳 Load `${scope.skills."mem-writing".name}` skill
 
         2. 🔳 Ensure scope identified
-           If unclear, use `AskUserQuestion`
+           If unclear, ${scope.harness.prose.questions.request}
 
         3. 🔳 Analyze target files
            * Apply ${scope.skills."mem-writing".reference} guidelines for analysis & proposal

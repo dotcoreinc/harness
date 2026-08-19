@@ -1,10 +1,15 @@
 {
-  nixantic.sources.main.blocks."context-understanding" = {
-    heading = "Context understanding";
+  nixantic.sources.main.blocks."context-understanding" =
+    { scope }:
+    {
+      heading = "Context understanding";
 
     content = ''
       Always ensure 10/10 understanding checklist and report it to user, before and after improving it.
-      Use explore code + web search + `AskUserQuestion` to fill gaps in understanding until 10/10.
+      ${scope.forHarness {
+        pi = "Use explore code and web search. ${scope.harness.prose.questions.request} to fill gaps in understanding until 10/10.";
+        default = "Use explore code + web search + use `AskUserQuestion` to fill gaps in understanding until 10/10.";
+      }}
       Prioritize web search for tool/library/framework usage since may have changed since cutoff.
     '';
 
@@ -21,5 +26,5 @@
       * [ ] Know success criteria / ACs: [state acceptance criteria per task]
       * [ ] Have web searched to ensure fresh decisions: [list search queries and key findings]
     '';
-  };
+    };
 }

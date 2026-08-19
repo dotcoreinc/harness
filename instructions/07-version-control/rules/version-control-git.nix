@@ -1,6 +1,7 @@
 {
-  nixantic.sources.version-control.instructions."rules/version-control-git" = {
+  nixantic.sources.version-control.instructions."version-control-git" = {
     when = { scope }: scope.settings.versionControl.mode == "git";
+    role = "rule";
     outputPath = "rules/version-control.md";
     heading = "Version Control (Git)";
     content = ''

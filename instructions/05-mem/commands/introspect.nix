@@ -14,7 +14,7 @@
 
         ## Instructions
 
-        1. If issue empty, use `AskUserQuestion` to get description
+        1. If issue empty, ${scope.harness.prose.questions.request} to get description
 
         2. 🔳 Analyze the issue:
            * What specific error/behavior occurred?

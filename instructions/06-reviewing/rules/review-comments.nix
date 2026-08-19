@@ -1,5 +1,6 @@
 {
-  nixantic.sources.review-workflow.instructions."rules/review-comments" = {
+  nixantic.sources.review-workflow.instructions."review-comments" = {
+    role = "rule";
     heading = "Review comments";
     content = ''
       REVIEW comments mark actionable feedback directly in code.

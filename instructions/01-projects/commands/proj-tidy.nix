@@ -32,11 +32,11 @@
            - Flag tasks that are done but not marked ✅
            - Flag phases where all tasks `[x]` but phase still 🔄
            - Flag requirements where linked work done but still 🔄
-           - Use `AskUserQuestion` before marking ✅
+             - ${scope.harness.prose.questions.request} before marking ✅
 
         6. 🔳 Triage Inbox items (if section exists)
            - For each item, propose to user: convert to requirement, add as phase task, move to Questions, or discard. Delete after.
-           - Use `AskUserQuestion` to confirm any triage decisions
+             - ${scope.harness.prose.questions.request} to confirm any triage decisions
 
         7. 🔳 Present findings
            - Group issues by category

@@ -24,12 +24,14 @@ let
       scopes.claude = mkScope {
         instructions = {
           "skills/demo/SKILL" = {
+            kind = "skill";
             embed = "Skill main body";
             outputPath = "skills/demo/SKILL.md";
           };
         };
         skillFiles = {
           "skills/demo/refs/data" = {
+            kind = "skillFile";
             embed = "Bundled data";
             outputPath = "skills/demo/refs/data.md";
           };
@@ -43,12 +45,14 @@ let
       scopes.claude = mkScope {
         instructions = {
           "skills/demo/SKILL" = {
+            kind = "skill";
             embed = "Skill main body";
             outputPath = "skills/demo/SKILL.md";
           };
         };
         skillFiles = {
           "skills/demo/SKILL" = {
+            kind = "skillFile";
             embed = "Sub-file colliding with the skill main file";
             outputPath = "skills/demo/SKILL.md";
           };

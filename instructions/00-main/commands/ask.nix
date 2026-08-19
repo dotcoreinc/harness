@@ -13,7 +13,7 @@
 
         ## Instructions
 
-        1. If topic empty or unclear, use `AskUserQuestion` to clarify
+         1. If topic empty or unclear, ${scope.harness.prose.questions.request} to clarify
 
         2. 🔳 Research (code, web search, web fetch) if question requires or context is missing
 

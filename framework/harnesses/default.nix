@@ -13,35 +13,19 @@
       taskCreate = "platform-task-tool";
     };
 
-    # See `mkAgent` for full attribute list.
-    renderAgentFrontmatter = { name, description, model, ... }:
-      renderFrontmatter [
-        { label = "name";        value = name;        }
-        { label = "description"; value = description; }
-        { label = "model";       value = model;       }
-        ...
-      ];
-
-    # See `mkCommand` for full attribute list.
-    renderCommandFrontmatter = { name, description, ... }:
-      renderFrontmatter [
-        { label = "name";        value = name;        }
-        { label = "description"; value = description; }
-        ...
-      ];
-
-    # See `mkSkill` for full attribute list.
-    renderSkillFrontmatter = { name, description, ... }:
-      renderFrontmatter [
-        { label = "name";        value = name;        }
-        { label = "description"; value = description; }
-        ...
-      ];
+    # Receives a normalized artifact and returns exactly these renderer-owned
+    # values. Shared code serializes ordered frontmatter and authored overrides.
+    renderArtifact = artifact: {
+      outputPath = "relative/path.md";
+      frontmatter = { name = artifact.name; };
+      frontmatterOrder = [ "name" ];
+    };
   }
 */
 
-{ renderFrontmatter }:
+{ renderFrontmatter, lib ? null, settings ? { } }:
 {
   claude = import ./claude.nix { inherit renderFrontmatter; };
   opencode = import ./opencode.nix { inherit renderFrontmatter; };
+  pi = import ./pi.nix { inherit lib settings; };
 }

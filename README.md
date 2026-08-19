@@ -5,7 +5,7 @@ This repo has two equal parts:
 - the Nixantic Nix-driven renderer and module framework for agentic config generation
 - built-in instructions with workflows, commands, instructions, skills, agents, and related source content
 
-Together they render authored instruction fragments into Claude Code and OpenCode config trees.
+Together they render authored instruction fragments into Claude Code, OpenCode, and Pi config trees.
 
 If you consume this repo as a dependency, the stable surface is the module API. The internal renderer layout is not the public contract.
 
@@ -76,6 +76,7 @@ let
             outputPath = scope.forHarness {
               claude = "CLAUDE.md";
               opencode = "AGENTS.md";
+              pi = "AGENTS.md";
             };
           };
       }
@@ -107,11 +108,42 @@ The Home Manager module imports the core module and adds install behavior. Share
       source = "AGENTS.md";
       target = ".config/opencode/AGENTS.md";
     }
+    {
+      harness = "pi";
+      source = "AGENTS.md";
+      target = ".pi/agent/AGENTS.md";
+    }
+    {
+      harness = "pi";
+      source = "agents/reviewer.md";
+      target = ".pi/agent/agents/reviewer.md";
+    }
   ];
 }
 ```
 
-Set `nixantic.instructions.wrappers.install = true;` if you want Home Manager to install the generic wrapper packages. Keep personal wrappers, sandboxing, shell aliases, and local runtime glue in your own Home Manager modules.
+Set `nixantic.instructions.wrappers.install = true;` if you want Home Manager to install the generic Claude Code and OpenCode wrapper packages. Keep personal wrappers, sandboxing, shell aliases, and local runtime glue in your own Home Manager modules. Consumers install and activate Pi and any Pi extensions themselves.
+
+### Pi settings
+
+Pi uses `AGENTS.md` for the main context, prompt templates under `prompts/`, Agent Skills under `skills/`, and neutral generated agent files under `agents/`. Map generated agent files to Pi's global `~/.pi/agent/agents/` directory or project `.pi/agents/` directory. Pi defaults to merging rules into `AGENTS.md`, while Claude Code and OpenCode default to standalone rule files. Set `rules.output` per harness when you need a different layout:
+
+```nix
+{
+  nixantic.instructions.harnesses = {
+    claude.rules.output = "files";
+    opencode.rules.output = "files";
+    pi = {
+      rules.output = "merge-main";
+      agents = "tintinweb";
+      tasks = "tintinweb";
+      questions = "pi-vault-questionnaire";
+    };
+  };
+}
+```
+
+The Pi adapter options describe the tools and file format expected by the consumer's Pi environment. They do not install, enable, or configure Pi, extensions, models, providers, credentials, themes, or mutable settings.
 
 ## flake-parts exposure
 
@@ -144,7 +176,7 @@ Build the built-in profile:
 nix build .#builtin
 ```
 
-The result contains both harness trees:
+The result contains all three harness trees:
 
 ```text
 claude/CLAUDE.md
@@ -153,6 +185,10 @@ claude/agents/...
 opencode/AGENTS.md
 opencode/commands/...
 opencode/agents/...
+pi/AGENTS.md
+pi/prompts/...
+pi/skills/...
+pi/agents/...
 ```
 
 Run wrappers from the flake if `claude` or `opencode` is on `PATH`:
@@ -217,12 +253,13 @@ Duplicate artifact keys fail evaluation. Duplicate Home Manager install targets 
 
 ## Harness layout
 
-The renderer currently ships two harnesses:
+The renderer currently ships three harnesses:
 
 - `claude`, output directory `claude/`
 - `opencode`, output directory `opencode/`
+- `pi`, output directory `pi/`
 
-Both harnesses receive the same normalized source declarations. Harness files decide frontmatter fields and output names, for example `CLAUDE.md` versus `AGENTS.md`.
+All harnesses receive the same normalized source declarations. Harness files decide frontmatter fields and output names, for example `CLAUDE.md` versus `AGENTS.md`. Pi uses the Agent Skills and prompt-template paths shown above.
 
 ## Checks
 

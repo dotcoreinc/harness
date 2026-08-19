@@ -2,6 +2,29 @@
 
 let
   frontmatter = import ./frontmatter.nix;
+  artifact = import ./artifact.nix { inherit lib; inherit (frontmatter) renderFrontmatter; };
+
+  renderArtifact =
+    args:
+    artifact.renderArtifact args.harness ({
+      role = null;
+      authoredOutputPath = null;
+      description = null;
+      model = null;
+      effort = null;
+      permission = null;
+      argumentHint = null;
+      metadata = null;
+      context = null;
+      agent = null;
+      allowedTools = null;
+      whenToUse = null;
+      disableModelInvocation = null;
+      userInvocable = null;
+      subtask = null;
+      skillKey = null;
+      subPath = null;
+    } // args);
 
   # mkReference :: string -> string -> string
   #   Formats a leading-article reference to an invocable instruction artifact.
@@ -12,26 +35,39 @@ let
   #   article so it composes with surrounding prose (for example "a `X` agent").
   mkAgentReference = name: "`${name}` agent";
 
-  # mkInstructions :: { heading, content, outputPath?, harnesses?, ... }
+  # mkInstructions :: { heading, content, role?, outputPath?, harnesses?, ... }
   #   Authored instruction files (CLAUDE.md, AGENTS.md, rule files).
-  #   Source: nixantic.sources.<source-owner>.instructions.*, keyed by output key.
+  #   Source: nixantic.sources.<source-owner>.instructions.*, keyed by logical name.
   #
   #   Required
   #     heading    - Top-level heading. Emitted as `# heading`; used as reference label.
   #     content    - Instruction body, appended after the heading.
   #
   #   Optional
-  #     outputPath - Output filename override. Defaults to `<instruction-key>.md`.
+  #     role       - "main", "rule", or "regular". Defaults to "regular" and
+  #                  selects the renderer's semantic default destination.
+  #     outputPath - Output filename override, which takes precedence over role defaults.
   #
   #   Scope-consumed
   #     harnesses  - Restrict to specific harnesses. Omitted = all harnesses.
   #
-  #   Returns: { outputPath, embed, reference }
-  mkInstructions = args: {
-    outputPath = args.outputPath or null;
-    embed = "# ${args.heading}\n\n${args.content}";
-    reference = "(See: ${args.heading})";
-  };
+  #   Returns: { kind, role, outputPath, embed, reference }
+  mkInstructions =
+    args:
+    let
+      role = args.role or "regular";
+    in
+    assert builtins.elem role [ "main" "rule" "regular" ] || throw "Nixantic instruction role must be main, rule, or regular";
+    renderArtifact {
+      inherit (args) harness key;
+      kind = "instruction";
+      inherit role;
+      content = "# ${args.heading}\n\n${args.content}";
+      authoredOutputPath = args.outputPath or null;
+    }
+    // {
+      reference = "(See: ${args.heading})";
+    };
 
   # mkAgent :: { harness, name, description, content, model?, permission?, harnesses?, ... }
   #   AI agent definitions.
@@ -85,15 +121,16 @@ let
 
       permission = args.permission or null;
       selectedPermission = if permission != null then permission.${args.harness.name} or null else null;
-      frontmatter = args.harness.renderAgentFrontmatter {
-        inherit (args) name description;
-        model = selectedModel;
-        effort = selectedEffort;
-        permission = selectedPermission;
-      };
     in
-    {
-      embed = "${frontmatter}\n${args.content}";
+    renderArtifact {
+      inherit (args) harness key name description content;
+      kind = "agent";
+      authoredOutputPath = args.outputPath or null;
+      model = selectedModel;
+      effort = selectedEffort;
+      permission = selectedPermission;
+    }
+    // {
       reference = mkAgentReference args.name;
     };
 
@@ -166,37 +203,25 @@ let
           null;
 
       optional = name: args.${name} or null;
-      frontmatter =
-        if kind == "directory" then
-          args.harness.renderSkillFrontmatter {
-            inherit (args) name description;
-            argumentHint = optional "argumentHint";
-            metadata = optional "metadata";
-            effort = selectedEffort;
-            context = optional "context";
-            agent = optional "agent";
-            allowedTools = optional "allowedTools";
-            whenToUse = optional "whenToUse";
-            disableModelInvocation = optional "disableModelInvocation";
-            userInvocable = optional "userInvocable";
-            model = selectedModel;
-          }
-        else
-          args.harness.renderCommandFrontmatter {
-            inherit (args) name description;
-            argumentHint = optional "argumentHint";
-            effort = selectedEffort;
-            context = optional "context";
-            agent = optional "agent";
-            allowedTools = optional "allowedTools";
-            subtask = optional "subtask";
-            model = selectedModel;
-          };
     in
-    {
-      embed = "${frontmatter}\n${args.content}";
+    renderArtifact {
+      inherit (args) harness key name description content;
+      kind = if kind == "directory" then "skill" else "command";
+      authoredOutputPath = args.outputPath or null;
+      model = selectedModel;
+      argumentHint = optional "argumentHint";
+      metadata = optional "metadata";
+      effort = selectedEffort;
+      context = optional "context";
+      agent = optional "agent";
+      allowedTools = optional "allowedTools";
+      whenToUse = optional "whenToUse";
+      disableModelInvocation = optional "disableModelInvocation";
+      userInvocable = optional "userInvocable";
+      subtask = optional "subtask";
+    }
+    // {
       reference = mkReference (if kind == "directory" then "skill" else "command") args.name;
-      outputPath = args.outputPath or null;
     };
 
   # mkSkillFile :: { content, outputPath?, ... }
@@ -216,10 +241,12 @@ let
   #     No per-sub-file harness filtering is supported.
   #
   #   Returns: { outputPath, embed }
-  mkSkillFile = args: {
-    outputPath = args.outputPath or null;
-    embed = args.content;
-  };
+  mkSkillFile = args:
+    renderArtifact {
+      inherit (args) harness key content skillKey subPath;
+      kind = "skillFile";
+      authoredOutputPath = args.outputPath or null;
+    };
 
   # mkCommand :: { harness, name, description, content, kind?, outputPath?, model?, harnesses?, asSkill?, onlyInjectBlockReferences?, argumentHint?, effort?, context?, agent?, allowedTools?, subtask?, ... }
   #   Slash-command definitions. Delegates to mkSkill with kind="flat".
@@ -263,7 +290,7 @@ let
     mkSkill (
       {
         kind = "flat";
-        outputPath = "commands/${name}.md";
+        key = args.key or name;
       }
       // args
       // {
@@ -409,5 +436,6 @@ in
     forHarness
     forSetting
     renderFrontmatter
+    renderArtifact
     ;
 }

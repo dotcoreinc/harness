@@ -1,5 +1,7 @@
 {
-  nixantic.sources.version-control.commands."pr-reply-comments" = {
+  nixantic.sources.version-control.commands."pr-reply-comments" =
+    { scope }:
+    {
     description = "Reply to imported PR review comments and clean up inline comments";
 
     content = ''
@@ -14,7 +16,10 @@
       1. 🔳 Find imported comments
          - Search for REVIEW: pr-import-comments pattern:
            ```bash
-           rg "REVIEW: pr-import-comments \(DB: (\d+), Node: ([^,]+), PR: (\d+)\)" -o --replace='DB: $1, Node: $2, PR: $3'
+            ${scope.forHarness {
+              pi = "rg \"REVIEW: pr-import-comments \\(DB: (\\d+), Node: ([^,]+), PR: (\\d+)\\)\" -o";
+              default = "rg \"REVIEW: pr-import-comments \\(DB: (\\d+), Node: ([^,]+), PR: (\\d+)\\)\" -o --replace='DB: $1, Node: $2, PR: $3'";
+            }}
            ```
 
       2. 🔳 Reply to comments
@@ -58,5 +63,5 @@
       * **Not threaded**: Check `"in_reply_to_id"` field in response
       * **New inline comment**: Used wrong endpoint format
     '';
-  };
+    };
 }

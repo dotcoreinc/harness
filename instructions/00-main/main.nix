@@ -1,25 +1,22 @@
 {
   nixantic.sources.main.instructions."main" =
     { scope }:
-    let
-      outputPath = scope.forHarness {
-        claude = "CLAUDE.md";
-        opencode = "AGENTS.md";
-      };
-    in
     {
-      inherit outputPath;
+      role = "main";
 
       heading = "Main instructions";
 
       content = ''
         ## Main instructions
 
-        CRITICAL: When encounter file reference (ex: @rules/general.md), if not already loaded, read it right away.
+        ${scope.forHarness {
+          pi = "CRITICAL: When encountering a referenced instruction or skill file, read it before acting.";
+          default = "CRITICAL: When encounter file reference (ex: @rules/general.md), if not already loaded, read it right away.";
+        }}
 
         When talking to me, be brief, clear and direct. Assume I'm on a small mobile screen and can't read pages of text. Talk as if you were talking to a junior. Prefer bullet points lists to prose/dense format. Prefer repeating words instead of using synonyms.
 
-        Main agents ask the user with `AskUserQuestion`. Sub-agents follow their agent instructions or return questions and decisions to the parent. Never ask directly in responses. Include enough context.
+        Main agents ${scope.harness.prose.questions.request}. Sub-agents follow their agent instructions or return questions and decisions to the parent. Never ask directly in responses. Include enough context.
 
         Trust explicit user input. Don't reconfirm clearly stated information or decisions. Ask only when something is missing, ambiguous, conflicting, or requires separate approval.
 

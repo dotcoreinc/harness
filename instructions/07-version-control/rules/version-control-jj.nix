@@ -1,6 +1,7 @@
 {
-  nixantic.sources.version-control.instructions."rules/version-control-jj" = {
+  nixantic.sources.version-control.instructions."version-control-jj" = {
     when = { scope }: scope.settings.versionControl.mode == "jj";
+    role = "rule";
     outputPath = "rules/version-control.md";
     heading = "Version Control (Jujutsu)";
     content = ''

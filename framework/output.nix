@@ -91,19 +91,20 @@ let
       // bom;
       resolveFilename =
         path: item: if item ? outputPath && item.outputPath != null then item.outputPath else "${path}.md";
-      startsWith = prefix: text: builtins.substring 0 (builtins.stringLength prefix) text == prefix;
       classifyEntry =
-        source: relativePath:
-        if source == "skillFile" then
+        kind:
+        if kind == "skillFile" then
           "skillSubfiles"
-        else if startsWith "agents/" relativePath then
+        else if kind == "agent" then
           "agents"
-        else if startsWith "commands/" relativePath then
+        else if kind == "command" then
           "commands"
-        else if builtins.match "skills/[^/]+/SKILL\\.md" relativePath != null then
+        else if kind == "skill" then
           "skills"
+        else if kind == "instruction" || kind == "supportFile" then
+          "instructions"
         else
-          "instructions";
+          throw "Nixantic output artifact has unsupported logical kind '${kind}'";
       mkEntry =
         scope: source: path: item:
         let
@@ -117,7 +118,7 @@ let
           harnessDir = scope.harness.outputDir;
           relativePath = filename;
           destination = "${scope.harness.outputDir}/${filename}";
-          category = classifyEntry source filename;
+          category = classifyEntry item.kind;
           file = mkFile scope.harness.outputDir path filename content;
         };
       mkRootFileEntry =
@@ -128,6 +129,7 @@ let
         {
           inherit content harnessName;
           source = "supportFile";
+          kind = "supportFile";
           harnessDir = scope.harness.outputDir;
           inherit relativePath;
           destination = "${scope.harness.outputDir}/${relativePath}";

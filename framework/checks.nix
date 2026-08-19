@@ -37,6 +37,33 @@ let
     scopes = renderedPackageScopes;
     postProcess = false;
   };
+  builtinBaselineSources = tooling.normalizeSourceDeclarations (
+    sourceSets.resolveSources { sourceRoots = [ ../instructions ]; }
+  );
+  builtinBaselineScopes = lib.mapAttrs (
+    _: harness:
+    tooling.makeScope {
+      inherit harness;
+      sources = builtinBaselineSources.sources;
+      settings = {
+        versionControl.mode = "jj";
+        harnesses = {
+          claude.rules.output = "files";
+          opencode.rules.output = "files";
+          pi = {
+            rules.output = "merge-main";
+            agents = "tintinweb";
+            tasks = "tintinweb";
+            questions = "pi-vault-questionnaire";
+          };
+        };
+      };
+    }
+  ) harnesses;
+  builtinBaselinePackage = tooling.mkPackage {
+    scopes = builtinBaselineScopes;
+    postProcess = true;
+  };
 
   renderedPackageCheck = pkgs.runCommand "rendered-package-check" { } ''
     test -f ${renderedPackage}/claude/CLAUDE.md
@@ -47,12 +74,20 @@ let
     test -f ${renderedPackage}/opencode/.gitignore
     test -f ${renderedPackage}/opencode/skills/safe-skill/SKILL.md
     test -f ${renderedPackage}/opencode/skills/safe-skill/refs/example.md
+    test -f ${renderedPackage}/pi/AGENTS.md
+    test -f ${renderedPackage}/pi/prompts/safe-command.md
+    test -f ${renderedPackage}/pi/skills/safe-skill/SKILL.md
+    test -f ${renderedPackage}/pi/skills/safe-skill/refs/example.md
 
     grep -F 'description: "Run: safely # not a YAML comment"' ${renderedPackage}/claude/commands/safe-command.md
     grep -F 'argument-hint: "[path:with:colon]"' ${renderedPackage}/claude/commands/safe-command.md
     grep -F 'allowed-tools: ["Bash(command: test)", "Read # docs"]' ${renderedPackage}/claude/commands/safe-command.md
     grep -F 'Command body.' ${renderedPackage}/claude/commands/safe-command.md
     grep -F '# Rendered Package OpenCode' ${renderedPackage}/opencode/AGENTS.md
+    grep -F '# Rendered Package Pi' ${renderedPackage}/pi/AGENTS.md
+    grep -F 'description: "Run: safely # not a YAML comment"' ${renderedPackage}/pi/prompts/safe-command.md
+    grep -F 'argument-hint: "[path:with:colon]"' ${renderedPackage}/pi/prompts/safe-command.md
+    grep -F 'name: "safe-skill"' ${renderedPackage}/pi/skills/safe-skill/SKILL.md
     test ! -s ${renderedPackage}/opencode/.gitignore
     grep -F 'Bundled reference body.' ${renderedPackage}/opencode/skills/safe-skill/refs/example.md
     grep -F '# Instruction BOM: claude' ${renderedPackage}/claude/BOM.md
@@ -66,6 +101,12 @@ let
     grep -F '## Root/main instruction summary' ${renderedPackage}/claude/BOM.md
     grep -F '## Per-command file-cost' ${renderedPackage}/claude/BOM.md
     ! grep -F '| BOM.md |' ${renderedPackage}/claude/BOM.md
+    touch $out
+  '';
+
+  builtinOutputBaselineCheck = pkgs.runCommand "builtin-output-baseline-check" { } ''
+    actual="$(cd ${builtinBaselinePackage} && LC_ALL=C find -L claude opencode -type f -print0 | LC_ALL=C sort -z | xargs -0 sha256sum | sha256sum)"
+    test "''${actual%% *}" = "5122baff5a8d2cb8f3117adf054aa131cd9b1011c0153cf35ef642214d102be8"
     touch $out
   '';
 
@@ -119,6 +160,7 @@ pkgs.runCommand "nixantic-instructions-check" { } ''
   : ${badRefCheck}
   : ${missingVendoredEncodingCheck}
   : ${renderedPackageCheck}
+  : ${builtinOutputBaselineCheck}
   : ${package}
   touch $out
 ''

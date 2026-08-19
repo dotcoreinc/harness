@@ -11,6 +11,9 @@
         claude = {
           disallowedTools = [ "Agent" ];
         };
+        pi = {
+          allowedSubagents = false;
+        };
       };
 
       model = {

@@ -10,6 +10,9 @@
         claude = {
           disallowedTools = [ "Agent" ];
         };
+        pi = {
+          allowedSubagents = false;
+        };
       };
       content = ''
         # Requirements Reviewer

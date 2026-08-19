@@ -1,7 +1,8 @@
 {
-  nixantic.sources.main.instructions."rules/task-management" =
+  nixantic.sources.main.instructions."task-management" =
     { scope }:
     {
+      role = "rule";
       heading = "Task management";
       content = ''
         ${scope.blocks."task-management".embed}

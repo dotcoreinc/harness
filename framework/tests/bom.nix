@@ -12,25 +12,30 @@ let
     harness = {
       name = "claude";
       outputDir = "claude";
+      rootFiles."metadata.txt" = "Support metadata";
     };
     instructions = {
       main = {
+        kind = "instruction";
         embed = "# Final Root\n\nFinal rendered root body.";
         outputPath = "CLAUDE.md";
       };
       "commands/demo" = {
+        kind = "command";
         embed = "---\ndescription: Demo\n---\nFinal rendered command body.";
-        outputPath = "commands/demo.md";
+        outputPath = "renamed-command.md";
       };
       "skills/demo/SKILL" = {
+        kind = "skill";
         embed = "---\nname: demo\ndescription: Demo skill\n---\nFinal rendered skill body.";
-        outputPath = "skills/demo/SKILL.md";
+        outputPath = "renamed-skill.md";
       };
     };
     skillFiles = {
       "skills/demo/refs/example" = {
+        kind = "skillFile";
         embed = "Final rendered bundled reference body.";
-        outputPath = "skills/demo/refs/example.md";
+        outputPath = "renamed-skill-file.md";
       };
     };
   };
@@ -51,6 +56,7 @@ let
       scopes.claude = scope // {
         instructions = scope.instructions // {
           authoredBom = {
+            kind = "instruction";
             embed = "Authored BOM body";
             outputPath = "BOM.md";
           };
@@ -72,7 +78,7 @@ let
     }
     {
       name = "BOM path override does not change manifest entry collection";
-      pass = builtins.length packageWithVendoredPath.passthru.bom.entries.claude == 4;
+      pass = builtins.length packageWithVendoredPath.passthru.bom.entries.claude == 5;
       detail = "expected vendored encoding path overrides to leave BOM manifest entries intact";
     }
     {
@@ -85,9 +91,17 @@ let
     {
       name = "Skill subfiles are classified separately";
       pass = builtins.any (
-        entry: entry.relativePath == "skills/demo/refs/example.md" && entry.category == "skillSubfiles"
+        entry: entry.relativePath == "renamed-skill-file.md" && entry.category == "skillSubfiles"
       ) packageWithDefaults.passthru.bom.entries.claude;
       detail = "expected skill subfiles to be included in BOM entries";
+    }
+    {
+      name = "BOM categories derive from logical kind instead of rendered paths";
+      pass =
+        builtins.any (entry: entry.relativePath == "renamed-command.md" && entry.category == "commands") packageWithDefaults.passthru.bom.entries.claude
+        && builtins.any (entry: entry.relativePath == "renamed-skill.md" && entry.category == "skills") packageWithDefaults.passthru.bom.entries.claude
+        && builtins.any (entry: entry.relativePath == "metadata.txt" && entry.category == "instructions") packageWithDefaults.passthru.bom.entries.claude;
+      detail = "expected command, skill, and support categories to survive renderer-selected paths";
     }
     {
       name = "Generated BOM is excluded from its own manifest";

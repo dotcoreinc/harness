@@ -15,7 +15,10 @@
 
         ${scope.blocks."project-files".embed}
 
-        Current date: !`date +%Y/%m/%d`
+        ${scope.forHarness {
+          pi = "Run `date +%Y/%m/%d` with the shell tool and use its stdout as the current date.";
+          default = "Current date: !`date +%Y/%m/%d`";
+        }}
 
         If ad-hoc project files are listed, stop and report. This command creates committed project files.
 
@@ -23,7 +26,7 @@
         1. Ensure ${scope.skills."proj-writing".reference} loaded.
 
         2. 🔳 Ensure context loaded, goal clear, task defined
-           - Use `AskUserQuestion` if the goal or task is empty or unclear.
+           - ${scope.harness.prose.questions.request} if the goal or task is empty or unclear.
 
         3. 🔳 Find or create project files
            - If no committed project files, confirm with user that a new project should be created and a suggestion of name based on goal or branch name. On confirmation, create project symlink, initial project doc structure following project files rules.
