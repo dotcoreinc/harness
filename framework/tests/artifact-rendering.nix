@@ -5,23 +5,25 @@ let
   harnesses = import ../harnesses { renderFrontmatter = builders.renderFrontmatter; };
   claude = harnesses.claude;
 
-  command = (builders.makeScope {
-    harness = claude;
-    sources.commands.demo = {
-      description = "Demo command";
-      content = "Body";
-      argumentHint = "[path]";
-    };
-  }).commands.demo;
+  command =
+    (builders.makeScope {
+      harness = claude;
+      sources.commands.demo = {
+        description = "Demo command";
+        content = "Body";
+        argumentHint = "[path]";
+      };
+    }).commands.demo;
 
-  overriddenInstruction = (builders.makeScope {
-    harness = claude;
-    sources.instructions.demo = {
-      heading = "Demo";
-      content = "Body";
-      outputPath = "nested/demo.md";
-    };
-  }).instructions.demo;
+  overriddenInstruction =
+    (builders.makeScope {
+      harness = claude;
+      sources.instructions.demo = {
+        heading = "Demo";
+        content = "Body";
+        outputPath = "nested/demo.md";
+      };
+    }).instructions.demo;
   overriddenArtifacts = builders.makeScope {
     harness = claude;
     sources = {
@@ -49,10 +51,13 @@ let
     };
   };
 
-  mkInvalidResult = renderer:
+  mkInvalidResult =
+    renderer:
     builtins.tryEval (
       (builders.makeScope {
-        harness = claude // { renderArtifact = renderer; };
+        harness = claude // {
+          renderArtifact = renderer;
+        };
         sources.instructions.demo = {
           heading = "Demo";
           content = "Body";
@@ -66,8 +71,13 @@ let
   });
   duplicateFrontmatterOrder = mkInvalidResult (_: {
     outputPath = "demo.md";
-    frontmatter = { description = "Demo"; };
-    frontmatterOrder = [ "description" "description" ];
+    frontmatter = {
+      description = "Demo";
+    };
+    frontmatterOrder = [
+      "description"
+      "description"
+    ];
   });
   unsafeRendererPath = mkInvalidResult (_: {
     outputPath = "../demo.md";
@@ -88,7 +98,9 @@ let
   cases = [
     {
       name = "adapter frontmatter follows its explicit order and omits null values";
-      pass = command.embed == "---\nname: \"demo\"\ndescription: \"Demo command\"\nargument-hint: \"[path]\"\n---\n\nBody";
+      pass =
+        command.embed
+        == "---\nname: \"demo\"\ndescription: \"Demo command\"\nargument-hint: \"[path]\"\n---\n\nBody";
       detail = "expected Claude command frontmatter in adapter-declared order without null fields";
     }
     {
@@ -102,7 +114,9 @@ let
         overriddenArtifacts.agents.demo.outputPath == "custom/agent.md"
         && overriddenArtifacts.commands.demo.outputPath == "custom/command.md"
         && overriddenArtifacts.skills.demo.outputPath == "custom/skill.md"
-        && overriddenArtifacts.skillFiles."skills/demo/refs/example.md".outputPath == "skills/demo/refs/example.md";
+        &&
+          overriddenArtifacts.skillFiles."skills/demo/refs/example.md".outputPath
+          == "skills/demo/refs/example.md";
       detail = "expected entry overrides and the authored-relative support-file path";
     }
     {

@@ -25,24 +25,52 @@ let
   effectiveSettings = lib.recursiveUpdate defaultSettings settings;
   rawHarnessSettings = settings.harnesses or { };
   configuredHarnesses = builtins.attrNames (effectiveSettings.harnesses or { });
-  knownHarnesses = [ "claude" "opencode" "pi" ];
+  knownHarnesses = [
+    "claude"
+    "opencode"
+    "pi"
+  ];
   harnessSettingKeys = {
     claude = [ "rules" ];
     opencode = [ "rules" ];
-    pi = [ "rules" "agents" "tasks" "questions" ];
+    pi = [
+      "rules"
+      "agents"
+      "tasks"
+      "questions"
+    ];
   };
   unknownHarnesses = builtins.filter (name: !(builtins.elem name knownHarnesses)) configuredHarnesses;
-  unknownHarnessSettingKeys = builtins.concatLists (map (
-    name: map (key: "${name}.${key}") (builtins.filter (key: !(builtins.elem key harnessSettingKeys.${name})) (builtins.attrNames rawHarnessSettings.${name}))
-  ) (builtins.filter (name: builtins.elem name knownHarnesses) (builtins.attrNames rawHarnessSettings)));
-  unknownRuleSettingKeys = builtins.concatLists (map (
-    name:
-    map (key: "${name}.rules.${key}") (
-      builtins.filter (key: key != "output") (builtins.attrNames (rawHarnessSettings.${name}.rules or { }))
-    )
-  ) (builtins.filter (name: builtins.elem name knownHarnesses) (builtins.attrNames rawHarnessSettings)));
+  unknownHarnessSettingKeys = builtins.concatLists (
+    map
+      (
+        name:
+        map (key: "${name}.${key}") (
+          builtins.filter (key: !(builtins.elem key harnessSettingKeys.${name})) (
+            builtins.attrNames rawHarnessSettings.${name}
+          )
+        )
+      )
+      (builtins.filter (name: builtins.elem name knownHarnesses) (builtins.attrNames rawHarnessSettings))
+  );
+  unknownRuleSettingKeys = builtins.concatLists (
+    map
+      (
+        name:
+        map (key: "${name}.rules.${key}") (
+          builtins.filter (key: key != "output") (
+            builtins.attrNames (rawHarnessSettings.${name}.rules or { })
+          )
+        )
+      )
+      (builtins.filter (name: builtins.elem name knownHarnesses) (builtins.attrNames rawHarnessSettings))
+  );
   invalidRuleOutputs = builtins.filter (
-    name: !(builtins.elem effectiveSettings.harnesses.${name}.rules.output [ "files" "merge-main" ])
+    name:
+    !(builtins.elem effectiveSettings.harnesses.${name}.rules.output [
+      "files"
+      "merge-main"
+    ])
   ) configuredHarnesses;
   instructionApi = import ./builders.nix { inherit pkgs lib; };
   piCapabilities = import ./harnesses/pi/capabilities.nix { inherit lib; };
@@ -55,10 +83,18 @@ let
   harnessNames = builtins.attrNames harnesses;
 
   ownerIndexedSources =
-    assert unknownHarnesses == [ ] || throw "Nixantic settings.harnesses has unknown harness keys: ${builtins.concatStringsSep ", " unknownHarnesses}";
-    assert unknownHarnessSettingKeys == [ ] || throw "Nixantic settings.harnesses has unknown setting keys: ${builtins.concatStringsSep ", " unknownHarnessSettingKeys}";
-    assert unknownRuleSettingKeys == [ ] || throw "Nixantic settings.harnesses has unknown rule setting keys: ${builtins.concatStringsSep ", " unknownRuleSettingKeys}";
-    assert invalidRuleOutputs == [ ] || throw "Nixantic settings.harnesses.<harness>.rules.output must be \"files\" or \"merge-main\": ${builtins.concatStringsSep ", " invalidRuleOutputs}";
+    assert
+      unknownHarnesses == [ ]
+      || throw "Nixantic settings.harnesses has unknown harness keys: ${builtins.concatStringsSep ", " unknownHarnesses}";
+    assert
+      unknownHarnessSettingKeys == [ ]
+      || throw "Nixantic settings.harnesses has unknown setting keys: ${builtins.concatStringsSep ", " unknownHarnessSettingKeys}";
+    assert
+      unknownRuleSettingKeys == [ ]
+      || throw "Nixantic settings.harnesses has unknown rule setting keys: ${builtins.concatStringsSep ", " unknownRuleSettingKeys}";
+    assert
+      invalidRuleOutputs == [ ]
+      || throw "Nixantic settings.harnesses.<harness>.rules.output must be \"files\" or \"merge-main\": ${builtins.concatStringsSep ", " invalidRuleOutputs}";
     assert piCapabilities.validate effectiveSettings.harnesses.pi;
     sourceSets.resolveSources { inherit sourceRoots sources; };
   flattenedSources = instructionApi.normalizeSourceDeclarations ownerIndexedSources;

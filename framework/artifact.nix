@@ -8,18 +8,21 @@ let
     && !(lib.hasPrefix "/" path)
     && builtins.all (part: part != "" && part != "." && part != "..") (lib.splitString "/" path);
 
-  validateOutputPath = source: path:
+  validateOutputPath =
+    source: path:
     if isSafeRelativePath path then
       path
     else
       throw "Nixantic ${source} must be a non-empty safe relative path";
 
-  duplicateKeys = values:
+  duplicateKeys =
+    values:
     builtins.filter (value: builtins.length (builtins.filter (other: other == value) values) > 1) (
       lib.unique values
     );
 
-  validateRendererResult = result:
+  validateRendererResult =
+    result:
     let
       resultKeys = builtins.attrNames result;
       requiredKeys = [
@@ -27,7 +30,8 @@ let
         "frontmatterOrder"
         "outputPath"
       ];
-      frontmatterKeys = if builtins.isAttrs result.frontmatter then builtins.attrNames result.frontmatter else [ ];
+      frontmatterKeys =
+        if builtins.isAttrs result.frontmatter then builtins.attrNames result.frontmatter else [ ];
       order = result.frontmatterOrder;
       duplicateOrder = if builtins.isList order then duplicateKeys order else [ ];
     in
@@ -44,7 +48,8 @@ let
     else
       result // { outputPath = validateOutputPath "artifact renderer outputPath" result.outputPath; };
 
-  renderArtifact = harness: artifact:
+  renderArtifact =
+    harness: artifact:
     let
       result = validateRendererResult (harness.renderArtifact artifact);
       outputPath =

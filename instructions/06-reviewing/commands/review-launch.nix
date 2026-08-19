@@ -47,14 +47,16 @@
            - Note: If an agent doesn't return any results but has finished, don't assume that it failed and
              just consider it as "no issues found". Don't restart the agents as they consume many tokens.
 
-         3. ${scope.forHarness {
-           pi = "Collect results with `${scope.harness.tools.agentResult}`. If an agent's summary lacks detail, use `${scope.harness.tools.agentSteer}` to send focused follow-up guidance.";
-           default = ''
-             Collect results from agent summaries (returned directly for foreground agents, or delivered
-             automatically for background agents). NEVER call `TaskOutput` or read agent output files.
-             If an agent's summary lacks detail, send it a follow-up message to ask specific questions.
-           '';
-         }}
+         3. ${
+           scope.forHarness {
+             pi = "Collect results with `${scope.harness.tools.agentResult}`. If an agent's summary lacks detail, use `${scope.harness.tools.agentSteer}` to send focused follow-up guidance.";
+             default = ''
+               Collect results from agent summaries (returned directly for foreground agents, or delivered
+               automatically for background agents). NEVER call `TaskOutput` or read agent output files.
+               If an agent's summary lacks detail, send it a follow-up message to ask specific questions.
+             '';
+           }
+         }
            Don't act on review comments — agents insert `// REVIEW:` comments in code directly.
            Summarize findings from agent summaries.
       '';

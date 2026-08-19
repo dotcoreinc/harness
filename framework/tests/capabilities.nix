@@ -41,7 +41,10 @@ let
       interactiveOnly = false;
     };
     schema = {
-      questionFields = [ "id" "header" ];
+      questionFields = [
+        "id"
+        "header"
+      ];
       questionCount = {
         min = 2;
         max = 4;
@@ -49,7 +52,10 @@ let
       options = {
         min = 3;
         max = 5;
-        fields = [ "title" "answer" ];
+        fields = [
+          "title"
+          "answer"
+        ];
       };
       optionalFields = [ "freeform" ];
     };
@@ -64,29 +70,32 @@ let
           tasks = "tintinweb";
           questions = "pi-vault-questionnaire";
         }
-        && defaults.capabilities.agents == {
-          launch = "Agent";
-          result = "get_subagent_result";
-          steer = "steer_subagent";
-        }
+        &&
+          defaults.capabilities.agents == {
+            launch = "Agent";
+            result = "get_subagent_result";
+            steer = "steer_subagent";
+          }
         && defaults.capabilities.tasks.create == "TaskCreate"
-        && defaults.capabilities.questions == {
-          ask = "questionnaire";
-          interactiveOnly = true;
-        }
+        &&
+          defaults.capabilities.questions == {
+            ask = "questionnaire";
+            interactiveOnly = true;
+          }
         && defaults.capabilities.skills.invocation == "pi-native"
         && defaults.adapters.agents.version == "0.17.1"
-        && defaults.adapters.agents.supportedPolicyFields == [
-          "allowedSubagents"
-          "disallowedTools"
-          "excludeExtensions"
-          "extensions"
-          "isolated"
-          "isolation"
-          "persistSession"
-          "skills"
-          "tools"
-        ]
+        &&
+          defaults.adapters.agents.supportedPolicyFields == [
+            "allowedSubagents"
+            "disallowedTools"
+            "excludeExtensions"
+            "extensions"
+            "isolated"
+            "isolation"
+            "persistSession"
+            "skills"
+            "tools"
+          ]
         && defaults.adapters.tasks.version == "0.8.0"
         && defaults.adapters.tasks.schema.execute.requiresAgentType
         && defaults.adapters.questions.version == "0.2.1"
@@ -95,7 +104,9 @@ let
     }
     {
       name = "Pi adapter selections remain independent";
-      pass = overridden.capabilities.agents.launch == "Agent" && overridden.capabilities.tasks.execute == "TaskExecute";
+      pass =
+        overridden.capabilities.agents.launch == "Agent"
+        && overridden.capabilities.tasks.execute == "TaskExecute";
       detail = "expected independently selected agent and task adapters to retain their respective capabilities";
     }
     {

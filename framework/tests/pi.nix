@@ -26,7 +26,10 @@ let
           effort = "high";
         };
         permission.pi = {
-          tools = [ "read" "bash" ];
+          tools = [
+            "read"
+            "bash"
+          ];
           disallowedTools = [ "write" ];
           extensions = [ "ext:tasks" ];
           excludeExtensions = [ "ext:unsafe" ];
@@ -46,7 +49,9 @@ let
         main = {
           description = "Demo skill";
           content = "Skill body";
-          metadata = { ignored = "by-pi"; };
+          metadata = {
+            ignored = "by-pi";
+          };
         };
         files."refs/example.md" = {
           kind = "md";
@@ -98,26 +103,39 @@ let
     }
     {
       name = "Pi prompt frontmatter preserves argument hints and Pi argument variables";
-      pass = scope.commands.demo.embed == "---\ndescription: \"Run demo\"\nargument-hint: \"<path>\"\n---\n\nUse $1 and $ARGUMENTS";
+      pass =
+        scope.commands.demo.embed
+        == "---\ndescription: \"Run demo\"\nargument-hint: \"<path>\"\n---\n\nUse $1 and $ARGUMENTS";
       detail = "expected Pi prompt-template frontmatter and unchanged supported argument variables";
     }
     {
       name = "Pi skills render the Agent Skills metadata subset";
-      pass = scope.skills.demo.embed == "---\nname: \"demo\"\ndescription: \"Demo skill\"\n---\n\nSkill body";
+      pass =
+        scope.skills.demo.embed == "---\nname: \"demo\"\ndescription: \"Demo skill\"\n---\n\nSkill body";
       detail = "expected name and description only, without Claude/OpenCode metadata";
     }
     {
       name = "Pi keeps authored entry paths and logical BOM kinds";
       pass =
         overriddenScope.commands.demo.outputPath == "custom/prompt.md"
-        && builtins.any (entry: entry.relativePath == "prompts/demo.md" && entry.category == "commands") bomEntries
-        && builtins.any (entry: entry.relativePath == "skills/demo/SKILL.md" && entry.category == "skills") bomEntries
-        && builtins.any (entry: entry.relativePath == "skills/demo/refs/example.md" && entry.category == "skillSubfiles") bomEntries;
+        && builtins.any (
+          entry: entry.relativePath == "prompts/demo.md" && entry.category == "commands"
+        ) bomEntries
+        && builtins.any (
+          entry: entry.relativePath == "skills/demo/SKILL.md" && entry.category == "skills"
+        ) bomEntries
+        && builtins.any (
+          entry: entry.relativePath == "skills/demo/refs/example.md" && entry.category == "skillSubfiles"
+        ) bomEntries;
       detail = "expected common authored-path precedence and logical kinds to survive Pi-native paths";
     }
     {
       name = "tintinweb agents render plugin path and ordered snake_case policy fields";
-      pass = scope.agents.reviewer.outputPath == "agents/reviewer.md" && scope.agents.reviewer.embed == "---\nname: \"reviewer\"\ndescription: \"Review code\"\ntools: [\"read\", \"bash\"]\ndisallowed_tools: [\"write\"]\nextensions: [\"ext:tasks\"]\nexclude_extensions: [\"ext:unsafe\"]\nskills: false\nallowed_subagents: [\"explorer\"]\nmodel: \"provider/model\"\nthinking: \"high\"\npersist_session: true\nisolated: true\nisolation: \"worktree\"\n---\n\nAgent body";
+      pass =
+        scope.agents.reviewer.outputPath == "agents/reviewer.md"
+        &&
+          scope.agents.reviewer.embed
+          == "---\nname: \"reviewer\"\ndescription: \"Review code\"\ntools: [\"read\", \"bash\"]\ndisallowed_tools: [\"write\"]\nextensions: [\"ext:tasks\"]\nexclude_extensions: [\"ext:unsafe\"]\nskills: false\nallowed_subagents: [\"explorer\"]\nmodel: \"provider/model\"\nthinking: \"high\"\npersist_session: true\nisolated: true\nisolation: \"worktree\"\n---\n\nAgent body";
       detail = "expected the v0.17.1 tintinweb schema in its declared field order";
     }
     {

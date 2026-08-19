@@ -1,4 +1,7 @@
-{ lib, settings ? { } }:
+{
+  lib,
+  settings ? { },
+}:
 
 let
   adapterRegistries = import ./pi/capabilities.nix { inherit lib; };
@@ -17,7 +20,8 @@ in
     agentSteer = resolved.capabilities.agents.steer;
   };
 
-  renderArtifact = artifact:
+  renderArtifact =
+    artifact:
     if artifact.kind == "instruction" then
       {
         outputPath =

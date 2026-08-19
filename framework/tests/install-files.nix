@@ -70,11 +70,7 @@ let
     }
   ];
   uniqueTargetsResult = builtins.tryEval (evalWith uniqueInstallFiles);
-  uniqueInstallSources =
-    if uniqueTargetsResult.success then
-      evalWith uniqueInstallFiles
-    else
-      { };
+  uniqueInstallSources = if uniqueTargetsResult.success then evalWith uniqueInstallFiles else { };
 
   duplicateTargetResult = builtins.tryEval (evalWith [
     {
@@ -107,10 +103,18 @@ let
       name = "Pi install.files sources resolve under the Pi package tree";
       pass =
         uniqueTargetsResult.success
-        && uniqueInstallSources.home.file.".pi/agent/AGENTS.md".source == "${uniqueInstallSources.nixantic.instructions.package}/pi/AGENTS.md"
-        && uniqueInstallSources.home.file.".pi/agent/prompts/foo.md".source == "${uniqueInstallSources.nixantic.instructions.package}/pi/prompts/foo.md"
-        && uniqueInstallSources.home.file.".pi/agent/skills/foo/SKILL.md".source == "${uniqueInstallSources.nixantic.instructions.package}/pi/skills/foo/SKILL.md"
-        && uniqueInstallSources.home.file.".pi/agent/agents/foo.md".source == "${uniqueInstallSources.nixantic.instructions.package}/pi/agents/foo.md";
+        &&
+          uniqueInstallSources.home.file.".pi/agent/AGENTS.md".source
+          == "${uniqueInstallSources.nixantic.instructions.package}/pi/AGENTS.md"
+        &&
+          uniqueInstallSources.home.file.".pi/agent/prompts/foo.md".source
+          == "${uniqueInstallSources.nixantic.instructions.package}/pi/prompts/foo.md"
+        &&
+          uniqueInstallSources.home.file.".pi/agent/skills/foo/SKILL.md".source
+          == "${uniqueInstallSources.nixantic.instructions.package}/pi/skills/foo/SKILL.md"
+        &&
+          uniqueInstallSources.home.file.".pi/agent/agents/foo.md".source
+          == "${uniqueInstallSources.nixantic.instructions.package}/pi/agents/foo.md";
       detail = "expected generic Home Manager mappings to resolve representative Pi context, prompt, skill, and agent files";
     }
     {

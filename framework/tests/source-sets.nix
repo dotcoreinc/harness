@@ -411,13 +411,9 @@ let
       name = "source-set instruction outputPath and forHarness";
       pass =
         featureScope.instructions."feature-rule".outputPath == "rules/feature-rule-claude.md"
-        &&
-          featureOpencodeScope.instructions."feature-rule".outputPath
-          == "rules/feature-rule-opencode.md"
+        && featureOpencodeScope.instructions."feature-rule".outputPath == "rules/feature-rule-opencode.md"
         && lib.hasInfix "Feature Rule (Claude)" featureScope.instructions."feature-rule".embed
-        &&
-          lib.hasInfix "Feature Rule (OpenCode)"
-            featureOpencodeScope.instructions."feature-rule".embed;
+        && lib.hasInfix "Feature Rule (OpenCode)" featureOpencodeScope.instructions."feature-rule".embed;
       detail = "expected source-set instruction to select harness-specific outputPath and heading via forHarness";
     }
 

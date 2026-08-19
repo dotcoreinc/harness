@@ -101,7 +101,8 @@ let
     }
   ];
   invalidModuleSettings = builtins.tryEval (
-    (evalCore [ { nixantic.instructions.harnesses.pi.tasks = "not-an-adapter"; } ]).config.nixantic.instructions.package
+    (evalCore [ { nixantic.instructions.harnesses.pi.tasks = "not-an-adapter"; } ])
+    .config.nixantic.instructions.package
   );
   directOverrideRendered = import ../framework {
     inherit pkgs lib;

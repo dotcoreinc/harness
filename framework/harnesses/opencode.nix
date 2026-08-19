@@ -1,5 +1,4 @@
-_:
-{
+_: {
   name = "opencode";
   outputDir = "opencode";
   rootFiles = {
@@ -12,7 +11,8 @@ _:
   };
   prose.questions.request = "use `AskUserQuestion`";
 
-  renderArtifact = artifact:
+  renderArtifact =
+    artifact:
     let
       translatedSubtask =
         if artifact.subtask != null then

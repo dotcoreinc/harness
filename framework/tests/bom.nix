@@ -98,9 +98,15 @@ let
     {
       name = "BOM categories derive from logical kind instead of rendered paths";
       pass =
-        builtins.any (entry: entry.relativePath == "renamed-command.md" && entry.category == "commands") packageWithDefaults.passthru.bom.entries.claude
-        && builtins.any (entry: entry.relativePath == "renamed-skill.md" && entry.category == "skills") packageWithDefaults.passthru.bom.entries.claude
-        && builtins.any (entry: entry.relativePath == "metadata.txt" && entry.category == "instructions") packageWithDefaults.passthru.bom.entries.claude;
+        builtins.any (
+          entry: entry.relativePath == "renamed-command.md" && entry.category == "commands"
+        ) packageWithDefaults.passthru.bom.entries.claude
+        && builtins.any (
+          entry: entry.relativePath == "renamed-skill.md" && entry.category == "skills"
+        ) packageWithDefaults.passthru.bom.entries.claude
+        && builtins.any (
+          entry: entry.relativePath == "metadata.txt" && entry.category == "instructions"
+        ) packageWithDefaults.passthru.bom.entries.claude;
       detail = "expected command, skill, and support categories to survive renderer-selected paths";
     }
     {

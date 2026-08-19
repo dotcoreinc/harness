@@ -3,7 +3,8 @@
 let
   tintinweb = import ./tintinweb.nix;
 
-  renderTaskWorkflow = adapter:
+  renderTaskWorkflow =
+    adapter:
     let
       inherit (adapter) capabilities schema;
     in
@@ -11,13 +12,15 @@ let
       Use `${capabilities.create}` to create a task. Use `${capabilities.list}`, `${capabilities.get}`, and `${capabilities.update}` to track it. Complete a task with `${schema.completion.tool} { status = "${schema.completion.status}"; }`. Use `${schema.dependencies.addBlocks}` and `${schema.dependencies.addBlockedBy}` for dependencies. Use `${schema.execute.tool}` only with an explicit `agentType`.
     '';
 
-  renderQuestionRequest = adapter:
+  renderQuestionRequest =
+    adapter:
     if adapter.capabilities.interactiveOnly then
       "use `${adapter.capabilities.ask}` in interactive mode; outside interactive mode, ask in normal chat and stop for the answer"
     else
       "use `${adapter.capabilities.ask}` or ask in normal chat, then stop for the answer";
 
-  renderQuestionWorkflow = adapter:
+  renderQuestionWorkflow =
+    adapter:
     let
       inherit (adapter) capabilities schema;
     in
@@ -64,7 +67,11 @@ let
         interactiveOnly = true;
       };
       schema = {
-        questionFields = [ "id" "header" "prompt" ];
+        questionFields = [
+          "id"
+          "header"
+          "prompt"
+        ];
         questionCount = {
           min = 1;
           max = 10;
@@ -72,9 +79,18 @@ let
         options = {
           min = 2;
           max = 12;
-          fields = [ "label" "value" "description" ];
+          fields = [
+            "label"
+            "value"
+            "description"
+          ];
         };
-        optionalFields = [ "multiSelect" "recommendation" "allowOther" "allowChat" ];
+        optionalFields = [
+          "multiSelect"
+          "recommendation"
+          "allowOther"
+          "allowChat"
+        ];
       };
       prose = {
         request = renderQuestionRequest { inherit capabilities schema; };
@@ -82,11 +98,15 @@ let
       };
     };
   };
-  select = kind: registry: selection:
-    assert builtins.isString selection || throw "Nixantic Pi ${kind} adapter selection must be a string";
-    assert builtins.hasAttr selection registry || throw "Nixantic Pi has no ${kind} adapter '${selection}'";
+  select =
+    kind: registry: selection:
+    assert
+      builtins.isString selection || throw "Nixantic Pi ${kind} adapter selection must be a string";
+    assert
+      builtins.hasAttr selection registry || throw "Nixantic Pi has no ${kind} adapter '${selection}'";
     registry.${selection};
-  resolve = config:
+  resolve =
+    config:
     let
       selections = {
         agents = config.agents or "tintinweb";
@@ -98,7 +118,12 @@ let
       questionAdapter = select "question" questionAdapters selections.questions;
     in
     {
-      inherit selections agentAdapter taskAdapter questionAdapter;
+      inherit
+        selections
+        agentAdapter
+        taskAdapter
+        questionAdapter
+        ;
       adapters = {
         agents = agentAdapter;
         tasks = taskAdapter;
@@ -118,7 +143,8 @@ let
 in
 {
   inherit renderTaskWorkflow renderQuestionWorkflow resolve;
-  validate = config:
+  validate =
+    config:
     let
       resolved = resolve config;
     in

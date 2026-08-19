@@ -83,7 +83,9 @@ let
       name = "Pi agents use tintinweb identities and explicitly deny nested delegation";
       pass =
         scope.agents."junior-dev".outputPath == "agents/junior-dev.md"
-        && builtins.all (agent: lib.hasInfix "allowed_subagents: false" agent.embed) (builtins.attrValues scope.agents);
+        && builtins.all (agent: lib.hasInfix "allowed_subagents: false" agent.embed) (
+          builtins.attrValues scope.agents
+        );
       detail = "expected adapter-discoverable agent paths with explicit nested-agent denial";
     }
     {

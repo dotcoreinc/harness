@@ -2,29 +2,35 @@
 
 let
   frontmatter = import ./frontmatter.nix;
-  artifact = import ./artifact.nix { inherit lib; inherit (frontmatter) renderFrontmatter; };
+  artifact = import ./artifact.nix {
+    inherit lib;
+    inherit (frontmatter) renderFrontmatter;
+  };
 
   renderArtifact =
     args:
-    artifact.renderArtifact args.harness ({
-      role = null;
-      authoredOutputPath = null;
-      description = null;
-      model = null;
-      effort = null;
-      permission = null;
-      argumentHint = null;
-      metadata = null;
-      context = null;
-      agent = null;
-      allowedTools = null;
-      whenToUse = null;
-      disableModelInvocation = null;
-      userInvocable = null;
-      subtask = null;
-      skillKey = null;
-      subPath = null;
-    } // args);
+    artifact.renderArtifact args.harness (
+      {
+        role = null;
+        authoredOutputPath = null;
+        description = null;
+        model = null;
+        effort = null;
+        permission = null;
+        argumentHint = null;
+        metadata = null;
+        context = null;
+        agent = null;
+        allowedTools = null;
+        whenToUse = null;
+        disableModelInvocation = null;
+        userInvocable = null;
+        subtask = null;
+        skillKey = null;
+        subPath = null;
+      }
+      // args
+    );
 
   # mkReference :: string -> string -> string
   #   Formats a leading-article reference to an invocable instruction artifact.
@@ -57,7 +63,13 @@ let
     let
       role = args.role or "regular";
     in
-    assert builtins.elem role [ "main" "rule" "regular" ] || throw "Nixantic instruction role must be main, rule, or regular";
+    assert
+      builtins.elem role [
+        "main"
+        "rule"
+        "regular"
+      ]
+      || throw "Nixantic instruction role must be main, rule, or regular";
     renderArtifact {
       inherit (args) harness key;
       kind = "instruction";
@@ -123,7 +135,13 @@ let
       selectedPermission = if permission != null then permission.${args.harness.name} or null else null;
     in
     renderArtifact {
-      inherit (args) harness key name description content;
+      inherit (args)
+        harness
+        key
+        name
+        description
+        content
+        ;
       kind = "agent";
       authoredOutputPath = args.outputPath or null;
       model = selectedModel;
@@ -205,7 +223,13 @@ let
       optional = name: args.${name} or null;
     in
     renderArtifact {
-      inherit (args) harness key name description content;
+      inherit (args)
+        harness
+        key
+        name
+        description
+        content
+        ;
       kind = if kind == "directory" then "skill" else "command";
       authoredOutputPath = args.outputPath or null;
       model = selectedModel;
@@ -241,9 +265,16 @@ let
   #     No per-sub-file harness filtering is supported.
   #
   #   Returns: { outputPath, embed }
-  mkSkillFile = args:
+  mkSkillFile =
+    args:
     renderArtifact {
-      inherit (args) harness key content skillKey subPath;
+      inherit (args)
+        harness
+        key
+        content
+        skillKey
+        subPath
+        ;
       kind = "skillFile";
       authoredOutputPath = args.outputPath or null;
     };

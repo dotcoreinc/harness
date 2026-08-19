@@ -1,5 +1,4 @@
-_:
-{
+_: {
   name = "claude";
   outputDir = "claude";
 
@@ -9,7 +8,8 @@ _:
   };
   prose.questions.request = "use `AskUserQuestion`";
 
-  renderArtifact = artifact:
+  renderArtifact =
+    artifact:
     let
       permissionValue = if artifact.permission != null then artifact.permission else { };
       common = {

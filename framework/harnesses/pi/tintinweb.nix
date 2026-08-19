@@ -10,40 +10,53 @@ let
     "skills"
     "tools"
   ];
-  validateStringList = field: value:
+  validateStringList =
+    field: value:
     if value == null then
       null
     else if builtins.isList value && builtins.all builtins.isString value then
       value
     else
       throw "Nixantic Pi tintinweb policy '${field}' must be a list of strings";
-  validateInheritance = field: value:
-    if value == null || builtins.isBool value then
-      value
-    else
-      validateStringList field value;
-  validateAllowedSubagents = value:
+  validateInheritance =
+    field: value:
+    if value == null || builtins.isBool value then value else validateStringList field value;
+  validateAllowedSubagents =
+    value:
     if value == null || builtins.isBool value || value == "all" || value == "*" then
       value
     else
       validateStringList "allowedSubagents" value;
-  validateBool = field: value:
+  validateBool =
+    field: value:
     if value == null || builtins.isBool value then
       value
     else
       throw "Nixantic Pi tintinweb policy '${field}' must be a boolean";
-  validatePolicy = policy:
+  validatePolicy =
+    policy:
     if policy == null then
       { }
     else if !builtins.isAttrs policy then
       throw "Nixantic Pi tintinweb agent policy must be an attrset"
     else
       let
-        unknownKeys = builtins.filter (key: !(builtins.elem key supportedPolicyKeys)) (builtins.attrNames policy);
+        unknownKeys = builtins.filter (key: !(builtins.elem key supportedPolicyKeys)) (
+          builtins.attrNames policy
+        );
         isolation = policy.isolation or null;
       in
-      assert unknownKeys == [ ] || throw "Nixantic Pi tintinweb agent policy has unsupported fields: ${builtins.concatStringsSep ", " unknownKeys}";
-      assert isolation == null || isolation == false || builtins.elem isolation [ "worktree" "off" ] || throw "Nixantic Pi tintinweb policy 'isolation' must be worktree, off, or false";
+      assert
+        unknownKeys == [ ]
+        || throw "Nixantic Pi tintinweb agent policy has unsupported fields: ${builtins.concatStringsSep ", " unknownKeys}";
+      assert
+        isolation == null
+        || isolation == false
+        || builtins.elem isolation [
+          "worktree"
+          "off"
+        ]
+        || throw "Nixantic Pi tintinweb policy 'isolation' must be worktree, off, or false";
       {
         tools = validateStringList "tools" (policy.tools or null);
         disallowedTools = validateStringList "disallowedTools" (policy.disallowedTools or null);
@@ -65,12 +78,23 @@ in
     steer = "steer_subagent";
   };
 
-  renderAgentArtifact = artifact:
+  renderAgentArtifact =
+    artifact:
     let
       policy = validatePolicy artifact.permission;
       thinking = artifact.effort;
     in
-    assert thinking == null || builtins.elem thinking [ "off" "minimal" "low" "medium" "high" "xhigh" ] || throw "Nixantic Pi tintinweb thinking must be off, minimal, low, medium, high, or xhigh";
+    assert
+      thinking == null
+      || builtins.elem thinking [
+        "off"
+        "minimal"
+        "low"
+        "medium"
+        "high"
+        "xhigh"
+      ]
+      || throw "Nixantic Pi tintinweb thinking must be off, minimal, low, medium, high, or xhigh";
     {
       outputPath = "agents/${artifact.name}.md";
       frontmatter = {

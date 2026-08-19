@@ -140,7 +140,16 @@ let
 
     agents = lib.mapAttrs (
       key: data:
-      self.scopeApi.mkAgent ({ inherit key; harness = self.harness; } // data // { name = data.name or key; })
+      self.scopeApi.mkAgent (
+        {
+          inherit key;
+          harness = self.harness;
+        }
+        // data
+        // {
+          name = data.name or key;
+        }
+      )
     ) (filterForHarness self self.rawAgents);
 
     commands = lib.mapAttrs (
@@ -306,7 +315,9 @@ let
   #   authoredInstructions → agentInstructions → commandInstructions →
   #   extraCommandsFromSkills → skillMainInstructions → extraSkillsFromCommands
   addInstructions = self: {
-    authoredInstructions = renderAuthoredInstructions self (filterForHarness self self.rawAuthoredInstructions);
+    authoredInstructions = renderAuthoredInstructions self (
+      filterForHarness self self.rawAuthoredInstructions
+    );
 
     agentInstructions = lib.mapAttrs' (
       name: agent: lib.nameValuePair "agents/${name}" agent
@@ -362,7 +373,9 @@ let
     let
       output = self.settings.harnesses.${self.harness.name}.rules.output or "files";
       activeRules = lib.filterAttrs (_: data: (data.role or "regular") == "rule") declarations;
-      mainKeys = builtins.attrNames (lib.filterAttrs (_: data: (data.role or "regular") == "main") declarations);
+      mainKeys = builtins.attrNames (
+        lib.filterAttrs (_: data: (data.role or "regular") == "main") declarations
+      );
       ruleKeys = builtins.attrNames activeRules;
       mergedDeclarations =
         if output == "files" then
@@ -376,18 +389,27 @@ let
             let
               mainKey = builtins.head mainKeys;
               mergedMain = declarations.${mainKey} // {
-                content = "${declarations.${mainKey}.content}\n\n${builtins.concatStringsSep "\n\n" (
-                  map (key: activeRules.${key}.content) ruleKeys
-                )}";
+                content = "${declarations.${mainKey}.content}\n\n${
+                  builtins.concatStringsSep "\n\n" (map (key: activeRules.${key}.content) ruleKeys)
+                }";
               };
             in
             (lib.filterAttrs (_: data: (data.role or "regular") != "rule") declarations)
-            // { ${mainKey} = mergedMain; }
+            // {
+              ${mainKey} = mergedMain;
+            }
         else
           throw "Nixantic rules.output must be \"files\" or \"merge-main\", got \"${output}\"";
     in
     lib.mapAttrs (
-      key: data: self.scopeApi.mkInstructions ({ inherit key; harness = self.harness; } // data)
+      key: data:
+      self.scopeApi.mkInstructions (
+        {
+          inherit key;
+          harness = self.harness;
+        }
+        // data
+      )
     ) mergedDeclarations;
 
   # ── Helpers ────────────────────────────────────────────────────────────────

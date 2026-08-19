@@ -4,11 +4,17 @@ let
   builders = import ../builders.nix { inherit pkgs lib; };
   output = import ../output.nix { inherit pkgs lib; };
   harness = (import ../harnesses { renderFrontmatter = builders.renderFrontmatter; }).claude;
-  opencodeHarness = (import ../harnesses { renderFrontmatter = builders.renderFrontmatter; }).opencode;
+  opencodeHarness =
+    (import ../harnesses { renderFrontmatter = builders.renderFrontmatter; }).opencode;
   mergeSettings.harnesses.claude.rules.output = "merge-main";
 
   mkScope = sources: settings: builders.makeScope { inherit harness sources settings; };
-  mkOpencodeScope = sources: settings: builders.makeScope { harness = opencodeHarness; inherit sources settings; };
+  mkOpencodeScope =
+    sources: settings:
+    builders.makeScope {
+      harness = opencodeHarness;
+      inherit sources settings;
+    };
   sources = {
     instructions = {
       main = {
@@ -38,16 +44,22 @@ let
       };
     };
   };
-  filesScope = mkScope (sources // {
-    instructions = sources.instructions // {
-      alpha.outputPath = "custom/alpha.md";
-    };
-  }) { };
-  opencodeFilesScope = mkOpencodeScope (sources // {
-    instructions = sources.instructions // {
-      alpha.outputPath = "custom/alpha.md";
-    };
-  }) { };
+  filesScope = mkScope (
+    sources
+    // {
+      instructions = sources.instructions // {
+        alpha.outputPath = "custom/alpha.md";
+      };
+    }
+  ) { };
+  opencodeFilesScope = mkOpencodeScope (
+    sources
+    // {
+      instructions = sources.instructions // {
+        alpha.outputPath = "custom/alpha.md";
+      };
+    }
+  ) { };
   mergedScope = mkScope sources mergeSettings;
   emptyScope = mkScope { } mergeSettings;
   missingMain = builtins.tryEval (
@@ -138,7 +150,9 @@ let
   cases = [
     {
       name = "files emits each rule and preserves authored output paths";
-      pass = filesScope.instructions.alpha.outputPath == "custom/alpha.md" && builtins.hasAttr "zebra" filesScope.instructions;
+      pass =
+        filesScope.instructions.alpha.outputPath == "custom/alpha.md"
+        && builtins.hasAttr "zebra" filesScope.instructions;
       detail = "expected files mode to keep standalone rule artifacts and overrides";
     }
     {
