@@ -6,7 +6,7 @@
       role = "rule";
       heading = "Interactive questions";
       content = ''
-        ${scope.harness.prose.questions.workflow}
+        Use `${scope.harness.tools.askUserQuestion}`.
       '';
     };
 }

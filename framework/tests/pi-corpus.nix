@@ -12,7 +12,7 @@ let
       rules.output = "merge-main";
       agents = "tintinweb";
       tasks = "tintinweb";
-      questions = "pi-vault-questionnaire";
+      questions = "rpiv-ask-user-question";
     };
   };
   pi = import ../harnesses/pi.nix { inherit lib settings; };
@@ -55,21 +55,9 @@ let
         && contains "`get_subagent_result`"
         && contains "`steer_subagent`"
         && contains "`TaskCreate`"
-        && contains "`questionnaire`"
+        && contains "`ask_user_question`"
         && builtins.all (needle: !(contains needle)) forbidden;
       detail = "expected configured agent, task, and question tools without unavailable tool leakage";
-    }
-    {
-      name = "Pi corpus documents the selected questionnaire schema and non-interactive stop behavior";
-      pass =
-        contains "1-10 questions"
-        && contains "`id`, `header`, `prompt`"
-        && contains "2-12 options"
-        && contains "recommendation"
-        && contains "allowOther"
-        && contains "allowChat"
-        && contains "normal chat and stop for the answer";
-      detail = "expected the configured questionnaire constraints and explicit non-interactive behavior";
     }
     {
       name = "Pi PR descriptions use native skills without a fork-context claim";

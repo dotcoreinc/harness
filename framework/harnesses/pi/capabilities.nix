@@ -3,98 +3,40 @@
 let
   tintinweb = import ./tintinweb.nix;
 
-  renderTaskWorkflow =
-    adapter:
-    let
-      inherit (adapter) capabilities schema;
-    in
-    ''
-      Use `${capabilities.create}` to create a task. Use `${capabilities.list}`, `${capabilities.get}`, and `${capabilities.update}` to track it. Complete a task with `${schema.completion.tool} { status = "${schema.completion.status}"; }`. Use `${schema.dependencies.addBlocks}` and `${schema.dependencies.addBlockedBy}` for dependencies. Use `${schema.execute.tool}` only with an explicit `agentType`.
-    '';
-
-  renderQuestionRequest =
-    adapter:
-    if adapter.capabilities.interactiveOnly then
-      "use `${adapter.capabilities.ask}` in interactive mode; outside interactive mode, ask in normal chat and stop for the answer"
-    else
-      "use `${adapter.capabilities.ask}` or ask in normal chat, then stop for the answer";
-
-  renderQuestionWorkflow =
-    adapter:
-    let
-      inherit (adapter) capabilities schema;
-    in
-    ''
-      ${renderQuestionRequest adapter}. Submit ${toString schema.questionCount.min}-${toString schema.questionCount.max} questions. Each question needs `${builtins.concatStringsSep "`, `" schema.questionFields}`. Include ${toString schema.options.min}-${toString schema.options.max} options, each with `${builtins.concatStringsSep "`, `" schema.options.fields}`.
-
-      Use only adapter-supported optional fields: `${builtins.concatStringsSep "`, `" schema.optionalFields}`. Stop and wait for the answer before continuing.
-    '';
-
   taskAdapters = {
-    tintinweb = rec {
+    tintinweb = {
       version = "0.8.0";
       capabilities = {
         create = "TaskCreate";
-        list = "TaskList";
-        get = "TaskGet";
-        update = "TaskUpdate";
-        output = "TaskOutput";
-        stop = "TaskStop";
-        execute = "TaskExecute";
       };
-      schema = {
-        completion = {
-          tool = "TaskUpdate";
-          status = "completed";
-        };
-        dependencies = {
-          addBlocks = "addBlocks";
-          addBlockedBy = "addBlockedBy";
-        };
-        execute = {
-          tool = "TaskExecute";
-          requiresAgentType = true;
-        };
-      };
-      prose.workflow = renderTaskWorkflow { inherit capabilities schema; };
+      prose.workflow = "Use the `Task*` tools for tasks.";
     };
   };
   questionAdapters = {
-    pi-vault-questionnaire = rec {
+    pi-vault-questionnaire = {
       version = "0.2.1";
       capabilities = {
         ask = "questionnaire";
-        interactiveOnly = true;
       };
-      schema = {
-        questionFields = [
-          "id"
-          "header"
-          "prompt"
-        ];
-        questionCount = {
-          min = 1;
-          max = 10;
-        };
-        options = {
-          min = 2;
-          max = 12;
-          fields = [
-            "label"
-            "value"
-            "description"
-          ];
-        };
-        optionalFields = [
-          "multiSelect"
-          "recommendation"
-          "allowOther"
-          "allowChat"
-        ];
+    };
+
+    # pi-question-tool (https://pi.dev/packages/pi-question-tool) registers
+    # `question` (single) and `questionnaire` tools for an interactive TTY.
+    pi-question-tool = {
+      version = "0.1.1";
+      capabilities = {
+        ask = "questionnaire";
       };
-      prose = {
-        request = renderQuestionRequest { inherit capabilities schema; };
-        workflow = renderQuestionWorkflow { inherit capabilities schema; };
+    };
+
+    # @juicesharp/rpiv-ask-user-question
+    # (npm:@juicesharp/rpiv-ask-user-question@2.4.0) registers the
+    # `ask_user_question` tool and removes it from the tool list in
+    # non-interactive runs.
+    rpiv-ask-user-question = {
+      version = "2.4.0";
+      capabilities = {
+        ask = "ask_user_question";
       };
     };
   };
@@ -111,7 +53,7 @@ let
       selections = {
         agents = config.agents or "tintinweb";
         tasks = config.tasks or "tintinweb";
-        questions = config.questions or "pi-vault-questionnaire";
+        questions = config.questions or "rpiv-ask-user-question";
       };
       agentAdapter = select "agent" { tintinweb = tintinweb; } selections.agents;
       taskAdapter = select "task" taskAdapters selections.tasks;
@@ -135,14 +77,16 @@ let
         questions = questionAdapter.capabilities;
         skills.invocation = "pi-native";
       };
+      # Extension tool descriptions already document tool usage in the model
+      # context, so rendered instructions only name the tools to use.
       prose = {
         tasks = taskAdapter.prose;
-        questions = questionAdapter.prose;
+        questions = { request = "use `${questionAdapter.capabilities.ask}`"; };
       };
     };
 in
 {
-  inherit renderTaskWorkflow renderQuestionWorkflow resolve;
+  inherit resolve;
   validate =
     config:
     let

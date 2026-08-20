@@ -54,7 +54,7 @@ let
             rules.output = "merge-main";
             agents = "tintinweb";
             tasks = "tintinweb";
-            questions = "pi-vault-questionnaire";
+            questions = "rpiv-ask-user-question";
           };
         };
       };

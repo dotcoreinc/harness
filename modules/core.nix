@@ -93,10 +93,10 @@ let
     test -n "$(ls -A ${rendered.package}/opencode/agents)"
     test -n "$(ls -A ${rendered.package}/pi/agents)"
     test ! -e ${rendered.package}/pi/rules
-    grep -F 'questionnaire' ${rendered.package}/pi/prompts/ctx-plan.md
+    grep -F 'ask_user_question' ${rendered.package}/pi/prompts/ctx-plan.md
     grep -F 'name: "proj-writing"' ${rendered.package}/pi/skills/proj-writing/SKILL.md
     grep -F 'name: "architecture-reviewer"' ${rendered.package}/pi/agents/architecture-reviewer.md
-    grep -F '`questionnaire`' ${rendered.package}/pi/AGENTS.md
+    grep -F '`ask_user_question`' ${rendered.package}/pi/AGENTS.md
     grep -F '`Agent`' ${rendered.package}/pi/AGENTS.md
     ! grep -R -F 'AskUserQuestion' ${rendered.package}/pi
     ! grep -R -F 'TaskOutput' ${rendered.package}/pi
@@ -194,8 +194,12 @@ in
             description = "Pi task capability adapter expected by the rendered instructions.";
           };
           questions = lib.mkOption {
-            type = lib.types.enum [ "pi-vault-questionnaire" ];
-            default = "pi-vault-questionnaire";
+            type = lib.types.enum [
+              "pi-vault-questionnaire"
+              "pi-question-tool"
+              "rpiv-ask-user-question"
+            ];
+            default = "rpiv-ask-user-question";
             description = "Pi question capability adapter expected by the rendered instructions.";
           };
         };

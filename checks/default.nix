@@ -90,7 +90,7 @@ let
       rules.output = "merge-main";
       agents = "tintinweb";
       tasks = "tintinweb";
-      questions = "pi-vault-questionnaire";
+      questions = "rpiv-ask-user-question";
     };
   };
   moduleOverrideEval = evalCore [
@@ -211,7 +211,7 @@ in
     test -d ${coreEval.config.nixantic.instructions.package}/pi/skills
     test -n "$(ls -A ${coreEval.config.nixantic.instructions.package}/pi/agents)"
     grep -F 'Main instructions' ${coreEval.config.nixantic.instructions.package}/pi/AGENTS.md
-    grep -F 'questionnaire' ${coreEval.config.nixantic.instructions.package}/pi/prompts/ctx-plan.md
+    grep -F 'ask_user_question' ${coreEval.config.nixantic.instructions.package}/pi/prompts/ctx-plan.md
     grep -F 'name: "proj-writing"' ${coreEval.config.nixantic.instructions.package}/pi/skills/proj-writing/SKILL.md
     grep -F 'name: "architecture-reviewer"' ${coreEval.config.nixantic.instructions.package}/pi/agents/architecture-reviewer.md
     test ! -e ${coreEval.config.nixantic.instructions.package}/pi/rules
@@ -455,7 +455,7 @@ in
     grep -F 'rules.output' ${../README.md}
     grep -F 'agents = "tintinweb"' ${../README.md}
     grep -F 'tasks = "tintinweb"' ${../README.md}
-    grep -F 'questions = "pi-vault-questionnaire"' ${../README.md}
+    grep -F 'questions = "rpiv-ask-user-question"' ${../README.md}
     grep -F 'target = ".pi/agent/agents/reviewer.md"' ${../README.md}
     grep -F '~/.pi/agent/agents/' ${../README.md}
     grep -F 'Consumers install and activate Pi' ${../README.md}

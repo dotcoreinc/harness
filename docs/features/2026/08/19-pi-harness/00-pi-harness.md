@@ -6,7 +6,9 @@ Add `pi` as the third supported instruction harness in this repository, alongsid
 
 ## Checkpoint
 
-Implementation is complete. Pi renders active `AGENTS.md`, neutral `agents/`, `prompts/`, and `skills/` artifacts through the shared renderer and configurable capability adapters; Home Manager installs them through generic source-to-target mappings. Full rendering, focused checks, final reviews, `nix build .#builtin`, and `nix flake check --show-trace` pass.
+Core work (R1–R5) is complete: Pi renders active `AGENTS.md`, neutral `agents/`, `prompts/`, and `skills/` artifacts through the shared renderer and configurable capability adapters; Home Manager installs them through generic source-to-target mappings. Full rendering, focused checks, final reviews, `nix build .#builtin`, and `nix flake check --show-trace` pass.
+
+Follow-up R6 switched the default Pi question adapter to `pi-question-tool`; follow-up R7 supersedes it with `rpiv-ask-user-question` (npm:@juicesharp/rpiv-ask-user-question@2.4.0, tool `ask_user_question`), keeping `pi-vault-questionnaire` and `pi-question-tool` selectable. R7 also strips Pi adapter prose to vague one-line tool mentions, following the OpenCode pattern: the question request renders as ``use `<tool>` `` and the task workflow as a one-line ``Use the `Task*` tools for tasks.`` mention, with adapter schemas, prose render generators, `interactiveOnly`, and unused capability fields removed. `nix flake check --show-trace` is green and the default render confirms the new adapter. Next step: commit.
 
 ## Requirements
 
@@ -17,7 +19,7 @@ Implementation is complete. Pi renders active `AGENTS.md`, neutral `agents/`, `p
   * R1.4: ✅ Add configurable `files` and `merge-main` rule output, defaulting to `merge-main` for Pi.
 * R2: ✅ Adapt the built-in instruction corpus to Pi's configured capabilities (Phase: Pi target and corpus compatibility)
   * R2.1: ✅ Render task workflows for the configured Pi task adapter, defaulting to tintinweb.
-  * R2.2: ✅ Render interactive questions for the configured Pi question adapter, defaulting to pi-vault-questionnaire.
+  * R2.2: ✅ Render interactive questions for the configured Pi question adapter, defaulting to rpiv-ask-user-question.
   * R2.3: ✅ Render sub-agent workflows and definitions for the configured Pi agent adapter, defaulting to tintinweb.
   * R2.4: ✅ Avoid emitting unavailable or incorrectly translated Pi tool and permission semantics.
 * R3: ✅ Expose Pi through the existing renderer and Home Manager consumer surfaces (Phase: Consumer integration and validation)
@@ -57,6 +59,10 @@ The implementation should extend the existing harness abstraction and source-fra
   * Important boundary: Capability adapters for task, question, and sub-agent tool names remain separate from artifact/frontmatter rendering. Only agent-file plugins such as tintinweb need both concerns composed.
   * Staff estimate: Approximately 500-800 production/source lines, 500-800 test/check lines, and 4-7 engineering days. Complexity is medium-high because of corpus adaptation and renderer regression risk, not Pi schema volume.
   * Decision: Adopt the common artifact-renderer contract across Claude Code, OpenCode, Pi, and Pi agent-file adapters. Keep capability adapters separate and do not build a universal plugin framework.
+* [x] Q: Should Pi adapter prose document tool usage details (schemas, question/option counts, optional fields)?
+  * Uncertainty: The question and task adapters carried full schema contracts rendered into AGENTS.md prose, duplicating what the Pi extensions' tool descriptions already provide in the model context.
+  * Tried: Question adapters rendered per-adapter schemas (required fields, count bounds, optional fields) and an interactive-mode fallback sentence; the task adapter rendered completion/dependency/agentType usage details.
+  * Result: No. Follow the OpenCode pattern of naming tools vaguely: the question request renders as ``use `<tool>` `` and the task workflow as a one-line ``Use the `Task*` tools for tasks.`` mention. Removed the prose render generators, adapter schemas, `interactiveOnly`, and capability fields nothing consumes (task list/get/update/output/stop/execute); adapters keep only `version`, the consumed tool names, and the task one-liner.
 
 ## Phases
 
@@ -89,7 +95,7 @@ Expose Pi through the existing module and Home Manager installation surfaces, ex
 - **flake.nix**: Public flake surface to assess for a third harness package/module export.
 - **modules/**: Module APIs and Home Manager instruction-file installation surface for Pi exposure; existing wrappers remain Claude Code/OpenCode-only.
 - **modules/home-manager.nix**: Existing `install.files` harness selector, which derives its enum from rendered harness names and installs selected paths.
-- **framework/**: Shared artifact renderer, explicit instruction roles, rule merging, Pi harness/adapters, logical BOM kinds, fixtures, and regression tests (Phases 02-03).
+- **framework/**: Shared artifact renderer, explicit instruction roles, rule merging, Pi harness/adapters, logical BOM kinds, fixtures, and regression tests (Phases 02-03; follow-ups R6-R7 for the Pi question adapter default, adapter selection, and prose strip).
 - **instructions/**: Pi-safe built-in corpus, explicit instruction roles, capability-aware workflows, and Pi-specific rules (Phases 02-03).
 - **modules/core.nix**: Typed per-harness rule output and Pi adapter options, settings threading, and corpus validation (Phase 04).
 - **modules/home-manager.nix**: Existing generic install-file adapter used unchanged for Pi mappings (Phase 04).
