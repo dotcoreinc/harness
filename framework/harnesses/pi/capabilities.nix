@@ -4,6 +4,8 @@ let
   tintinweb = import ./tintinweb.nix;
 
   taskAdapters = {
+    # @tintinweb/pi-tasks (npm:@tintinweb/pi-tasks@0.8.0) registers the
+    # `Task*` task tools.
     tintinweb = {
       version = "0.8.0";
       capabilities = {
@@ -13,6 +15,8 @@ let
     };
   };
   questionAdapters = {
+    # @pi-vault/pi-questionnaire (npm:@pi-vault/pi-questionnaire@0.2.1)
+    # registers the `questionnaire` tool.
     pi-vault-questionnaire = {
       version = "0.2.1";
       capabilities = {

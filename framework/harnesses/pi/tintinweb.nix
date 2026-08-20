@@ -1,3 +1,6 @@
+# @tintinweb/pi-subagents (npm:@tintinweb/pi-subagents@0.17.1) registers the
+# `Agent`, `get_subagent_result`, and `steer_subagent` sub-agent tools; this
+# adapter targets its `agents/*.md` frontmatter format.
 let
   supportedPolicyKeys = [
     "allowedSubagents"
